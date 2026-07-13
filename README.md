@@ -54,6 +54,7 @@ def procesar_registro(registro):
 datos_limpios = []
 for item in lista_api:
     datos_limpios.append(procesar_registro(item))
+```
 
 ## Control de errores
 
