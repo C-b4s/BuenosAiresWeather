@@ -322,6 +322,32 @@ fname
 #+RESULTS:
 [[file:./images/denuncias_canton.png]]
 
+Debido a que el archivo index.org se abre dentro de la carpeta
+/content/, y en cambio el servidor http de emacs se ejecuta desde la
+carpeta /public/ es necesario copiar el archivo a la ubicación
+equivalente en ~/public/images~
+
+#+begin_src shell
+cp -rfv ./images/* ~/ProyectoFinal/BuenosAiresWeather/weather-site/public/images
+#+end_src
+
+#+RESULTS:
+| './images/denuncias_canton.png'                                 | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/denuncias_canton.png'                                 |
+| './images/denuncias_canton.png:Zone.Identifier'                 | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/denuncias_canton.png:Zone.Identifier'                 |
+| './images/denuncias_canton.png:Zone.Identifier:Zone.Identifier' | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/denuncias_canton.png:Zone.Identifier:Zone.Identifier' |
+| './images/denuncias_tiempo.png'                                 | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/denuncias_tiempo.png'                                 |
+| './images/denuncias_tiempo.png:Zone.Identifier'                 | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/denuncias_tiempo.png:Zone.Identifier'                 |
+| './images/denuncias_tiempo.png:Zone.Identifier:Zone.Identifier' | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/denuncias_tiempo.png:Zone.Identifier:Zone.Identifier' |
+| './images/humidity.png'                                         | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/humidity.png'                                         |
+| './images/humidity.png:Zone.Identifier'                         | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/humidity.png:Zone.Identifier'                         |
+| './images/humidity.png:Zone.Identifier:Zone.Identifier'         | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/humidity.png:Zone.Identifier:Zone.Identifier'         |
+| './images/temperature.png'                                      | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/temperature.png'                                      |
+| './images/temperature.png:Zone.Identifier'                      | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/temperature.png:Zone.Identifier'                      |
+| './images/temperature.png:Zone.Identifier:Zone.Identifier'      | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/temperature.png:Zone.Identifier:Zone.Identifier'      |
+| './images/wind_speed.png'                                       | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/wind_speed.png'                                       |
+| './images/wind_speed.png:Zone.Identifier'                       | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/wind_speed.png:Zone.Identifier'                       |
+| './images/wind_speed.png:Zone.Identifier:Zone.Identifier'       | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/wind_speed.png:Zone.Identifier:Zone.Identifier'       |
+
 #+BEGIN_export html
 <script>
 console.log("Bloque JavaScript desde procesamiento-robos.org cargado y ejecutado.");
