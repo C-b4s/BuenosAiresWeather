@@ -342,13 +342,13 @@ Se presenta una muestra de 10 valores aleatorios de los datos obtenidos.
 import os
 import pandas as pd
 # lectura del archivo csv obtenido
-df = pd.read_csv('/home/stevenech/BuenosAiresWeather/clima-buenosaires-hoy.csv')
+df = pd.read_csv('/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/clima-buenosaires-hoy.csv')
 # se imprime la estructura del dataframe en forma de filas x columnas
 print(df.shape)
 #+end_src
 
 #+RESULTS:
-: (11, 27)
+: (18, 27)
 
 Resultado del número de filas y columnas leídos del archivo csv
 
@@ -362,16 +362,16 @@ table = [list(table1)]+[None]+table1.values.tolist()
 #+RESULTS:
 | weather                                                                          | base     | visibility | dt                  | timezone |      id | name        | cod | coord.lon | coord.lat | main.temp | main.feels_like | main.temp_min | main.temp_max | main.pressure | main.humidity | main.sea_level | main.grnd_level | wind.speed | wind.deg | wind.gust | clouds.all | sys.type |  sys.id | sys.country | sys.sunrise | sys.sunset |
 |----------------------------------------------------------------------------------+----------+------------+---------------------+----------+---------+-------------+-----+-----------+-----------+-----------+-----------------+---------------+---------------+---------------+---------------+----------------+-----------------+------------+----------+-----------+------------+----------+---------+-------------+-------------+------------|
-| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 17:57:05 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     14.89 |           14.55 |         14.37 |         15.53 |          1009 |            81 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2008409 | AR          |  1784113074 | 1784149239 |
-| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 17:59:07 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.51 |           15.21 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
-| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 19:00:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     16.01 |           15.73 |         14.93 |         16.61 |          1009 |            79 |           1009 |            1008 |       0.45 |       45 |      1.79 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
-| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:30:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.76 |           15.48 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       45 |      1.79 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
-| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:45:02 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.82 |           15.55 |         14.88 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       45 |      1.79 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
-| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 16:48:02 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.23 |           14.87 |         13.82 |         16.05 |          1008 |            79 |           1008 |            1007 |       0.45 |       23 |      0.89 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 20:00:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     16.62 |            16.4 |         14.93 |         17.26 |          1009 |            79 |           1009 |            1008 |       3.18 |       49 |      7.27 |        100 |        2 | 2020613 | AR          |  1784113074 | 1784149239 |
 | [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 17:59:41 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.51 |           15.21 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
 | [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:07:18 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.65 |           15.36 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       23 |      0.89 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
-| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:15:04 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.65 |           15.36 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       23 |      0.89 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
-| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:00:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.51 |           15.21 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 19:45:02 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     16.56 |           16.33 |         14.93 |         17.26 |          1009 |            79 |           1009 |            1008 |       3.18 |       49 |      7.27 |        100 |        2 | 2020613 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:45:02 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.82 |           15.55 |         14.88 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       45 |      1.79 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:30:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.76 |           15.48 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       45 |      1.79 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 21:15:05 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.92 |           15.66 |          15.4 |         16.61 |          1009 |            80 |           1009 |            1008 |        2.7 |       50 |      5.48 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 19:15:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     16.62 |           16.37 |         15.44 |         17.26 |          1009 |            78 |           1009 |            1008 |       3.04 |       49 |      7.22 |        100 |        2 | 2020613 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 16:48:02 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.23 |           14.87 |         13.82 |         16.05 |          1008 |            79 |           1008 |            1007 |       0.45 |       23 |      0.89 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 17:59:07 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.51 |           15.21 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
 
 ** Gráfica Temperatura vs Tiempo
 
@@ -455,13 +455,15 @@ carpeta /public/ es necesario copiar el archivo a la ubicación
 equivalente en ~/public/images~
 
 #+begin_src shell
-cp -rfv ./images/* ~/BuenosAiresWeather/weather-site/public/images
+cp -rfv ./images/* ~/ProyectoFinal/BuenosAiresWeather/weather-site/public/images
 #+end_src
 
 #+RESULTS:
-| './images/humidity.png'    | -> | '/home/stevenech/BuenosAiresWeather/weather-site/public/images/humidity.png'    |
-| './images/temperature.png' | -> | '/home/stevenech/BuenosAiresWeather/weather-site/public/images/temperature.png' |
-| './images/wind_speed.png'  | -> | '/home/stevenech/BuenosAiresWeather/weather-site/public/images/wind_speed.png'  |
+| './images/denuncias_canton.png' | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/denuncias_canton.png' |
+| './images/denuncias_tiempo.png' | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/denuncias_tiempo.png' |
+| './images/humidity.png'         | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/humidity.png'         |
+| './images/temperature.png'      | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/temperature.png'      |
+| './images/wind_speed.png'       | -> | '/home/mateoijt-epn/ProyectoFinal/BuenosAiresWeather/weather-site/public/images/wind_speed.png'       |
 
 * Sección: Buenos Aires Weather
 - [[file:buenos_aires_weather.org][Ir a la sección de Buenos Aires Weather]]
