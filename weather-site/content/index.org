@@ -163,45 +163,99 @@ WSL. Las etapas del problema se subdividen en:
     6. Su código debe estar respaldado en GitHub/BitBucket, la
        dirección será remitida en la contestación de la tarea
 ** Descripción del código
-En esta sección se debe detallar segmentos importantes del código
-desarrollado así como la **estrategia de solución** adoptada por el
-grupo para resolver el problema. Divida su código en unidades
-funcionales para facilitar su presentación y exposición.
+En esta sección se detalla la estrategia de solución adoptada para el
+procesamiento dinámico y almacenamiento del clima de Buenos Aires.
 
-Lectura del API
-#+begin_src python :session :results output exports both
-def adder(a,b):
-    return a+b
-print(adder(5,3))
-#+end_src
+*** Lectura del API
+Para obtener los datos climáticos de Buenos Aires en tiempo real, se
+realiza una petición HTTP GET utilizando la librería =requests=,
+consultando el endpoint de OpenWeatherMap con parámetros de latitud y
+longitud configurados para unidades métricas (°C y m/s).
 
-Puede tener que borrar los dos puntos para que el resultado aparezca
-en el HTML. En mi caso no fue necesario. Pruebe.
-#+RESULTS:
-: 8
+#+begin_src python :session :results output :exports both
+import requests
+API_KEY = "62d2107136670bd7f62c2c23cea30130"
+LAT = -34.6037
+LON = -58.3816
+URL = f"https://api.openweathermap.org/data/2.5/weather?lat={LAT}&lon={LON}&appid={API_KEY}&units=metric"
 
-Convertir /Json/ a /Diccionario/ de Python
-#+begin_src python :session :results output exports both
-print(adder(8,8))
-#+end_src
-
-#+RESULTS:
-: 16
-
-
-Guardar el archivo csv
-#+begin_src python :session :results output exports both
-print(adder(8,-18))
+response = requests.get(URL)
+print(response.status_code)
 #+end_src
 
 #+RESULTS:
-: -10
+: 200
+
+*** Convertir /Json/ a /Diccionario/ de Python (Normalización)
+La respuesta que nos da la API viene en un formato llamado JSON y la
+convierte en en una tabla limpia usando la librería Pandas. Además, se
+agrega una columna con la fecha y hora exacta de la consulta (=dt=)
+para saber exactamente cuándo se tomaron los datos.
+
+#+begin_src python :session :results output :exports both
+import pandas as pd
+from datetime import datetime
+
+data = response.json()
+df_new = pd.json_normalize(data)
+df_new['dt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+print(df_new[['name', 'main.temp', 'dt']].to_string(index=False))
+#+end_src
+
+*** Guardar el archivo csv
+Para asegurarnos de que el programa no falle si faltan datos (como cuando no está lloviendo), el script primero revisa si el archivo CSV ya existe en la carpeta. Si el archivo ya está creado, lo abre y le pega los datos nuevos al final para no borrar lo que guardaron tus compañeros[cite: 2]. Si el archivo no existe, lo crea por primera vez.
+
+#+begin_src python :session :results output :exports both
+import os
+
+csv_path = 'clima-buenosaires-hoy.csv'
+if os.path.exists(csv_path):
+    df_existing = pd.read_csv(csv_path)
+    df_all = pd.concat([df_existing, df_new], ignore_index=True)
+    df_all.to_csv(csv_path, index=False)
+else:
+    df_new.to_csv(csv_path, index=False)
+print("CSV actualizado con éxito.")
+#+end_src
+
 
 ** Script ejecutable sh
-Se coloca el contenido del script ejecutable. Recuerde que se debe
-utilizar el entorno de **anaconda/mamba** denominado **iccd332** para
-la ejecución de Python; independientemente de que tenga una
-instalación nativa de Python
+Se coloca el contenido del script ejecutable. Para evitar fallos con
+el comando =source= en la terminal, se utiliza el intérprete de
+comandos =/bin/bash= en lugar de =sh= estándar. Además, se definieron
+rutas relativas a la carpeta personal del usuario (=~/=) para asegurar
+que el script se ejecute correctamente en el sistema de cualquier
+miembro del grupo.
+
+El archivo ejecutable =get-weather.sh= contiene la siguiente
+estructura para cargar de forma segura el entorno de
+**anaconda/mamba** denominado **iccd332**:
+
+#+begin_src shell :exports both
+#!/bin/bash
+# Cargar conda de forma segura usando el home genérico (~/)
+if [ -f ~/miniforge3/etc/profile.d/conda.sh ]; then
+    source ~/miniforge3/etc/profile.d/conda.sh
+elif [ -f ~/miniconda3/etc/profile.d/conda.sh ]; then
+    source ~/miniconda3/etc/profile.d/conda.sh
+elif [ -f ~/anaconda3/etc/profile.d/conda.sh ]; then
+    source ~/anaconda3/etc/profile.d/conda.sh
+fi
+
+# Activar el entorno de la materia
+conda activate iccd332
+
+# Moverse a la carpeta del proyecto y ejecutar
+cd ~/BuenosAiresWeather
+python main.py
+#+end_src
+
+Finalmente, se convierte en ejecutable dándole permisos de lectura y
+ejecución en el sistema operativo:
+
+#+begin_src shell :exports both
+chmod +x get-weather.sh
+#+end_src
 
 En el caso de los shell script se puede usar `which sh` para conocer
 la ubicación del ejecutable
@@ -240,10 +294,11 @@ Poner comando/s aquí
 #+end_src
 
 ** Configuración de Crontab
-Se indica la configuración realizada en crontab para la adquisición de datos
+Se indica la configuración realizada en crontab para la adquisición de
+datos de manera automática cada 15 minutos:
 
 #+begin_src shell
-*/t * * * * cd <City>Weather && ./get-weather.sh >> output.log 2>&1
+*/15 * * * * cd ~/BuenosAiresWeather && ./get-weather.sh >> output.log 2>&1
 #+end_src
 
 - Recuerde remplazar <City> por el nombre de la ciudad que analice
