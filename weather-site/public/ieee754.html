@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+<!-- 2026-07-16 Thu 00:52 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Conversión a IEEE 754</title>
+<meta name="author" content="Mateo Jami" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Conversión a IEEE 754</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org430dcd3">1. 1. Introducción Teórica</a></li>
+<li><a href="#orga06833d">2. 2. Estructura Matemática y Limitaciones</a></li>
+<li><a href="#orge29044e">3. 3. Pasos Lógicos de Resolución (Ej: -248.75)</a></li>
+<li><a href="#orgd1ebaf9">4. 4. Lógica e Implementación Interactiva en Python</a></li>
+<li><a href="#org8470294">5. 5. Demostración de Funcionalidad</a></li>
+<li><a href="#org72e069b">6. 6. Conversor Interactivo (Frontend)</a></li>
+</ul>
+</div>
+</div>
+<p>
+<a href="index.html">Volver a la página principal</a>
+</p>
+
+<div id="outline-container-org430dcd3" class="outline-2">
+<h2 id="org430dcd3"><span class="section-number-2">1.</span> 1. Introducción Teórica</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+En la computación, representaciones tradicionales como la coma fija o el complemento a 2 son excelentes para números enteros, pero no permiten representar números muy grandes o muy pequeños, como por ejemplo, el diámetro de la Tierra. Para solucionar esto, utilizamos la representación en coma flotante, regida mundialmente por el estándar IEEE 754.
+</p>
+
+<p>
+En nuestra vida cotidiana utilizamos el Sistema Decimal (base 10). Sin embargo, el procesador, y específicamente la Unidad Aritmética Lógica (ALU), solo comprende señales eléctricas representadas en el Sistema Binario (base 2). El estándar IEEE 754 nos permite tomar un número decimal con fracciones y convertirlo a una estructura binaria estandarizada. En este proyecto trabajaremos con precisión simple (32 bits).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga06833d" class="outline-2">
+<h2 id="orga06833d"><span class="section-number-2">2.</span> 2. Estructura Matemática y Limitaciones</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+La expresión general para la representación en coma flotante binaria es la versión informática de la notación científica tradicional:
+</p>
+
+<p>
+\[
+\pm S \times B^{\pm E}
+\]
+</p>
+
+<p>
+Desglosando esta expresión bajo el estándar de 32 bits:
+</p>
+<ul class="org-ul">
+<li><b><b>\(\pm\) (Signo, 1 bit):</b></b> Determina si el número es positivo (\(0\)) o negativo (\(1\)).</li>
+<li><b><b>\(S\) (Mantisa, 23 bits):</b></b> Representa los dígitos de precisión. Se normaliza para obligar a que el número adquiera la forma \(1.bbb...b\).</li>
+<li><b><b>\(B\) (Base):</b></b> En el mundo de la ALU, la base siempre será \(2\).</li>
+<li><b><b>\(\pm E\) (Exponente, 8 bits):</b></b> Posee una representación sesgada para evitar exponentes binarios negativos. Se le suma un valor fijo llamado sesgo (BIAS), que para 32 bits es de \(127\).</li>
+</ul>
+
+<p>
+La expresión matemática fundamental que condensa el estándar y permite regresar de IEEE 754 a decimal es:
+</p>
+
+<p>
+\[
+(-1)^s \times 1.m \times 2^{e-127}
+\]
+</p>
+
+<p>
+<b><b>Limitaciones del Estándar:</b></b>
+Al tener un espacio finito de 32 bits, existen huecos de precisión y límites estrictos:
+</p>
+<ul class="org-ul">
+<li><b><b>Límites Positivos:</b></b> Desde \(2^{-127}\) hasta \((2 - 2^{-23}) \times 2^{128}\).</li>
+<li><b><b>Límites Negativos:</b></b> Desde \(-(2 - 2^{-23}) \times 2^{128}\) hasta \(-2^{-127}\).</li>
+</ul>
+
+<p>
+Exceder estos límites genera errores de <b>Overflow</b> o <b>Underflow</b>. También existen representaciones especiales como \(0^+\), \(0^-\), infinito (\(+\infty\), \(-\infty\)) y el estado <b>NaN</b> (Not a Number).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge29044e" class="outline-2">
+<h2 id="orge29044e"><span class="section-number-2">3.</span> 3. Pasos Lógicos de Resolución (Ej: -248.75)</h2>
+<div class="outline-text-2" id="text-3">
+<ol class="org-ol">
+<li><b><b>Identificar el bit de signo:</b></b> Como \(-248.75\) es negativo, el bit es \(1\).</li>
+<li><b><b>Convertir a binario sin signo:</b></b> La parte entera (\(248\)) y la fraccionaria (\(0.75\)) nos dan \(11111000.11\).</li>
+<li><b><b>Normalización:</b></b> Movemos la coma \(7\) espacios a la izquierda para dejar un solo \(1\): \(1.111100011 \times 2^7\).</li>
+<li><b><b>Ajustar el sesgo:</b></b> Al exponente (\(7\)) le sumamos \(127\), resultando en \(134\).</li>
+<li><b><b>Convertir el exponente:</b></b> \(134\) en binario de 8 bits es \(10000110\).</li>
+<li><b><b>Construir la mantisa:</b></b> Tomamos los bits a la derecha de la coma (\(111100011\)).</li>
+<li><b><b>Completar con ceros:</b></b> Llenamos a la derecha hasta los \(23\) bits.</li>
+</ol>
+<p>
+Resultado final: <code>1 10000110 11110001100000000000000</code>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd1ebaf9" class="outline-2">
+<h2 id="orgd1ebaf9"><span class="section-number-2">4.</span> 4. Lógica e Implementación Interactiva en Python</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Para cumplir con los requerimientos de interacción sin detener la compilación de la página HTML, el siguiente código utiliza el concepto de <b>Tangling</b>. Al compilar el sitio web, Emacs exportará automáticamente este código a un archivo llamado <code>conversor_ieee754.py</code> que podrá ejecutarse desde cualquier terminal.
+</p>
+
+<p>
+El script incluye un bucle <code>while</code> infinito que evalúa mediante un <code>try-except</code> si el número ingresado por el usuario cumple con los límites de 32 bits predefinidos. 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">obtener_signo</span>(numero):
+    <span style="font-style: italic;">"""Devuelve '1' si es negativo, '0' si es positivo."""</span>
+    <span style="font-weight: bold;">return</span> <span style="font-style: italic;">"1"</span> <span style="font-weight: bold;">if</span> numero &lt; 0 <span style="font-weight: bold;">else</span> <span style="font-style: italic;">"0"</span>
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">entero_a_binario</span>(entero):
+    <span style="font-style: italic;">"""Convierte la parte entera a binario dividiendo sucesivamente para 2."""</span>
+    <span style="font-weight: bold;">if</span> entero == 0: <span style="font-weight: bold;">return</span> <span style="font-style: italic;">"0"</span>
+    <span style="font-weight: bold; font-style: italic;">binario</span> = <span style="font-style: italic;">""</span>
+    <span style="font-weight: bold;">while</span> entero &gt; 0:
+        <span style="font-weight: bold; font-style: italic;">binario</span> = <span style="font-weight: bold;">str</span>(entero % 2) + binario
+        <span style="font-weight: bold; font-style: italic;">entero</span> = entero // 2
+    <span style="font-weight: bold;">return</span> binario
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">fraccion_a_binario</span>(fraccion, precision=50):
+    <span style="font-style: italic;">"""Multiplica sucesivamente la fracci&#243;n por 2 para extraer los bits."""</span>
+    <span style="font-weight: bold; font-style: italic;">binario</span> = <span style="font-style: italic;">""</span>
+    <span style="font-weight: bold;">while</span> fraccion &gt; 0 <span style="font-weight: bold;">and</span> <span style="font-weight: bold;">len</span>(binario) &lt; precision:
+        <span style="font-weight: bold; font-style: italic;">fraccion</span> *= 2
+        <span style="font-weight: bold; font-style: italic;">bit</span> = <span style="font-weight: bold;">int</span>(fraccion)
+        <span style="font-weight: bold; font-style: italic;">binario</span> += <span style="font-weight: bold;">str</span>(bit)
+        <span style="font-weight: bold; font-style: italic;">fraccion</span> -= bit
+    <span style="font-weight: bold;">return</span> binario <span style="font-weight: bold;">if</span> binario <span style="font-weight: bold;">else</span> <span style="font-style: italic;">"0"</span>
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">normalizar_y_exponente</span>(binario_entero, binario_fraccion):
+    <span style="font-style: italic;">"""Desplaza la coma, calcula el exponente sesgado y ajusta la mantisa a 23 bits."""</span>
+    <span style="font-weight: bold;">if</span> binario_entero == <span style="font-style: italic;">"0"</span> <span style="font-weight: bold;">and</span> <span style="font-style: italic;">"1"</span> <span style="font-weight: bold;">not</span> <span style="font-weight: bold;">in</span> binario_fraccion:
+        <span style="font-weight: bold;">return</span> <span style="font-style: italic;">"00000000"</span>, <span style="font-style: italic;">"0"</span> * 23
+
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Desplazamiento de la coma
+</span>    <span style="font-weight: bold;">if</span> binario_entero != <span style="font-style: italic;">"0"</span>:
+        <span style="font-weight: bold; font-style: italic;">exponente</span> = <span style="font-weight: bold;">len</span>(binario_entero) - 1
+        <span style="font-weight: bold; font-style: italic;">mantisa_cruda</span> = binario_entero[1:] + binario_fraccion
+    <span style="font-weight: bold;">else</span>:
+        <span style="font-weight: bold; font-style: italic;">indice_uno</span> = binario_fraccion.find(<span style="font-style: italic;">"1"</span>)
+        <span style="font-weight: bold; font-style: italic;">exponente</span> = -(indice_uno + 1)
+        <span style="font-weight: bold; font-style: italic;">mantisa_cruda</span> = binario_fraccion[indice_uno + 1:]
+
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Suma del sesgo (127) y formato
+</span>    <span style="font-weight: bold; font-style: italic;">bin_exponente</span> = <span style="font-weight: bold;">bin</span>(exponente + 127)[2:].zfill(8)
+    <span style="font-weight: bold; font-style: italic;">mantisa_final</span> = mantisa_cruda.ljust(23, <span style="font-style: italic;">'0'</span>)[:23]
+
+    <span style="font-weight: bold;">return</span> bin_exponente, mantisa_final
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">convertir_a_ieee754</span>(numero):
+    <span style="font-style: italic;">"""Ensambla el Signo, Exponente y Mantisa."""</span>
+    <span style="font-weight: bold;">if</span> numero == 0.0:
+        <span style="font-weight: bold;">return</span> <span style="font-style: italic;">"0 00000000 00000000000000000000000"</span>
+
+    <span style="font-weight: bold; font-style: italic;">signo</span> = obtener_signo(numero)
+    <span style="font-weight: bold; font-style: italic;">num_abs</span> = <span style="font-weight: bold;">abs</span>(numero)
+    <span style="font-weight: bold; font-style: italic;">entero</span> = <span style="font-weight: bold;">int</span>(num_abs)
+    <span style="font-weight: bold; font-style: italic;">fraccion</span> = num_abs - entero
+
+    <span style="font-weight: bold; font-style: italic;">bin_entero</span> = entero_a_binario(entero)
+    <span style="font-weight: bold; font-style: italic;">bin_fraccion</span> = fraccion_a_binario(fraccion)
+
+    <span style="font-weight: bold; font-style: italic;">exponente</span>, <span style="font-weight: bold; font-style: italic;">mantisa</span> = normalizar_y_exponente(bin_entero, bin_fraccion)
+    <span style="font-weight: bold;">return</span> f<span style="font-style: italic;">"</span>{signo}<span style="font-style: italic;"> </span>{exponente}<span style="font-style: italic;"> </span>{mantisa}<span style="font-style: italic;">"</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">consola_interactiva</span>():
+    <span style="font-style: italic;">"""Bucle principal de validaci&#243;n y captura de datos por consola."""</span>
+    <span style="font-weight: bold; font-style: italic;">MAX_FLOAT_32</span> = 3.4028235e38
+    <span style="font-weight: bold; font-style: italic;">MIN_FLOAT_32</span> = 1.17549435e-38
+
+    <span style="font-weight: bold;">print</span>(<span style="font-style: italic;">"--- Conversor Decimal a IEEE 754 (32 bits) ---"</span>)
+    <span style="font-weight: bold;">while</span> <span style="font-weight: bold; text-decoration: underline;">True</span>:
+        <span style="font-weight: bold; font-style: italic;">entrada</span> = <span style="font-weight: bold;">input</span>(<span style="font-style: italic;">"Ingrese un numero decimal (o 'q' para salir): "</span>)
+        <span style="font-weight: bold;">if</span> entrada.lower() == <span style="font-style: italic;">'q'</span>:
+            <span style="font-weight: bold;">break</span>
+        <span style="font-weight: bold;">try</span>:
+            <span style="font-weight: bold; font-style: italic;">numero</span> = <span style="font-weight: bold;">float</span>(entrada)
+            <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Validaci&#243;n estricta del rango
+</span>            <span style="font-weight: bold;">if</span> numero != 0.0 <span style="font-weight: bold;">and</span> (<span style="font-weight: bold;">abs</span>(numero) &gt; MAX_FLOAT_32 <span style="font-weight: bold;">or</span> <span style="font-weight: bold;">abs</span>(numero) &lt; MIN_FLOAT_32):
+                <span style="font-weight: bold;">print</span>(<span style="font-style: italic;">"Error: El numero excede los limites de 32 bits (Overflow/Underflow). Intente de nuevo.</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">"</span>)
+                <span style="font-weight: bold;">continue</span>
+
+            <span style="font-weight: bold; font-style: italic;">resultado</span> = convertir_a_ieee754(numero)
+            <span style="font-weight: bold;">print</span>(f<span style="font-style: italic;">"IEEE 754: </span>{resultado}<span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">"</span>)
+        <span style="font-weight: bold;">except</span> <span style="font-weight: bold; text-decoration: underline;">ValueError</span>:
+            <span style="font-weight: bold;">print</span>(<span style="font-style: italic;">"Error: Ingrese un valor numerico valido.</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">"</span>)
+
+<span style="font-weight: bold;">if</span> <span style="font-weight: bold;">__name__</span> == <span style="font-style: italic;">"__main__"</span>:
+    consola_interactiva()
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8470294" class="outline-2">
+<h2 id="org8470294"><span class="section-number-2">5.</span> 5. Demostración de Funcionalidad</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Dado que la web actúa como un documento estático, a continuación se presentan los resultados directos de la ejecución del algoritmo de conversión para comprobar su fiabilidad con datos de prueba:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Se realiza una prueba emulando los datos de la funci&#243;n extra&#237;da en el Tangle
+</span><span style="font-weight: bold; font-style: italic;">numeros_de_prueba</span> = [-248.75, 2.0, 0.085]
+
+<span style="font-weight: bold;">for</span> num <span style="font-weight: bold;">in</span> numeros_de_prueba:
+    <span style="font-weight: bold;">print</span>(f<span style="font-style: italic;">"Decimal: </span>{num}<span style="font-style: italic;">"</span>)
+    <span style="font-weight: bold;">print</span>(f<span style="font-style: italic;">"IEEE 754: </span>{convertir_a_ieee754(num)}<span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">"</span>)
+</pre>
+</div>
+
+<pre class="example">
+Decimal: -248.75
+IEEE 754: 1 10000110 11110001100000000000000
+
+Decimal: 2.0
+IEEE 754: 0 10000000 00000000000000000000000
+
+Decimal: 0.085
+IEEE 754: 0 01111011 01011100001010001111010
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org72e069b" class="outline-2">
+<h2 id="org72e069b"><span class="section-number-2">6.</span> 6. Conversor Interactivo (Frontend)</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+A continuación, puedes probar la conversión directamente en la página web. 
+</p>
+
+<div style="background-color: #f4f4f4; padding: 20px; border-radius: 8px; margin-top: 20px;">
+    <label for="numeroDecimal"><strong>Ingrese un número decimal:</strong></label>
+    <input type="text" id="numeroDecimal" placeholder="Ej. -248.75" style="padding: 5px; margin-left: 10px;">
+    <button onclick="procesarIEEE()" style="padding: 5px 15px; cursor: pointer; background-color: #333; color: white; border: none; border-radius: 4px;">Convertir</button>
+    
+    <!-- Zona para mensajes al usuario -->
+    <div id="mensajeUsuario" style="margin-top: 15px; font-weight: bold;"></div>
+    
+    <!-- Zona para el resultado exitoso -->
+    <div id="resultadoBits" style="margin-top: 10px; font-family: monospace; font-size: 16px; background-color: #e8e8e8; padding: 10px; border-radius: 4px; display: none;"></div>
+</div>
+
+<script>
+// --- Lógica Matemática traducida a JavaScript ---
+const enteroABinario = (entero) => {
+    if (entero === 0) return "0";
+    let binario = "";
+    while (entero > 0) {
+        binario = (entero % 2).toString() + binario;
+        entero = Math.floor(entero / 2);
+    }
+    return binario;
+};
+
+const fraccionABinario = (fraccion) => {
+    let binario = "";
+    let iteraciones = 0;
+    while (fraccion > 0 && iteraciones < 50) {
+        fraccion *= 2;
+        let bit = Math.floor(fraccion);
+        binario += bit.toString();
+        fraccion -= bit;
+        iteraciones++;
+    }
+    return binario === "" ? "0" : binario;
+};
+
+const normalizarYExponente = (binEntero, binFraccion) => {
+    if (binEntero === "0" && !binFraccion.includes("1")) {
+        return ["00000000", "0".repeat(23)];
+    }
+    
+    let exponente = 0;
+    let mantisaCruda = "";
+    
+    if (binEntero !== "0") {
+        exponente = binEntero.length - 1;
+        mantisaCruda = binEntero.substring(1) + binFraccion;
+    } else {
+        let indiceUno = binFraccion.indexOf("1");
+        exponente = -(indiceUno + 1);
+        mantisaCruda = binFraccion.substring(indiceUno + 1);
+    }
+    
+    let exponenteSesgado = exponente + 127;
+    let binExponente = exponenteSesgado.toString(2).padStart(8, '0');
+    
+    let mantisaFinal = mantisaCruda.padEnd(23, '0').substring(0, 23);
+    return [binExponente, mantisaFinal];
+};
+
+const procesarIEEE = () => {
+    const input = document.getElementById("numeroDecimal").value;
+    const contenedorMensaje = document.getElementById("mensajeUsuario");
+    const contenedorResultado = document.getElementById("resultadoBits");
+
+    // Ocultar resultados previos
+    contenedorResultado.style.display = "none";
+
+    // Validación 1: Si no es un número
+    if (isNaN(input) || input.trim() === "") {
+        contenedorMensaje.style.color = "orange";
+        contenedorMensaje.innerText = "⚠️ Advertencia: Por favor, ingresa un número decimal válido.";
+        return;
+    }
+
+    const numero = parseFloat(input);
+
+    // Validación 2: Límites de 32 bits
+    const MAX_FLOAT_32 = 3.4028235e38;
+    const MIN_FLOAT_32 = 1.17549435e-38;
+    
+    if (numero !== 0 && (Math.abs(numero) > MAX_FLOAT_32 || Math.abs(numero) < MIN_FLOAT_32)) {
+        contenedorMensaje.style.color = "red";
+        contenedorMensaje.innerText = "❌ Error: El número excede los límites de 32 bits (Overflow/Underflow).";
+        return;
+    }
+
+    // Ejecución del algoritmo
+    const signo = numero < 0 ? "1" : "0";
+    const numAbs = Math.abs(numero);
+    const entero = Math.floor(numAbs);
+    const fraccion = numAbs - entero;
+
+    const binEntero = enteroABinario(entero);
+    const binFraccion = fraccionABinario(fraccion);
+    
+    const [exponente, mantisa] = normalizarYExponente(binEntero, binFraccion);
+    
+    // Si el número es 0, forzar todo a ceros
+    const resultadoFinal = (numero === 0) 
+        ? "0 00000000 00000000000000000000000" 
+        : `${signo} ${exponente} ${mantisa}`;
+
+    // Mostrar resultados
+    contenedorMensaje.style.color = "green";
+    contenedorMensaje.innerText = "✅ Conversión realizada con éxito.";
+    
+    contenedorResultado.style.display = "block";
+    contenedorResultado.innerHTML = `
+        <strong>Signo:</strong> ${signo} <br>
+        <strong>Exponente:</strong> ${exponente} <br>
+        <strong>Mantisa:</strong> ${mantisa} <br><br>
+        <strong>IEEE 754:</strong> ${resultadoFinal}
+    `;
+};
+</script>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Fecha: 2026-07-12</p>
+<p class="author">Autor: Mateo Jami</p>
+<p class="date">Created: 2026-07-16 Thu 00:52</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,295 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil expand-links:t f:t
+#+options: inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+options: tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+title: Conversión a IEEE 754
+#+date: 2026-07-12
+#+author: Mateo Jami
+#+email: mateo.jami@epn.edu.ec
+#+language: es
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 27.1 (Org mode 9.7.5)
+#+cite_export:
+
+[[file:index.org][Volver a la página principal]]
+
+* 1. Introducción Teórica
+En la computación, representaciones tradicionales como la coma fija o el complemento a 2 son excelentes para números enteros, pero no permiten representar números muy grandes o muy pequeños, como por ejemplo, el diámetro de la Tierra. Para solucionar esto, utilizamos la representación en coma flotante, regida mundialmente por el estándar IEEE 754.
+
+En nuestra vida cotidiana utilizamos el Sistema Decimal (base 10). Sin embargo, el procesador, y específicamente la Unidad Aritmética Lógica (ALU), solo comprende señales eléctricas representadas en el Sistema Binario (base 2). El estándar IEEE 754 nos permite tomar un número decimal con fracciones y convertirlo a una estructura binaria estandarizada. En este proyecto trabajaremos con precisión simple (32 bits).
+
+* 2. Estructura Matemática y Limitaciones
+La expresión general para la representación en coma flotante binaria es la versión informática de la notación científica tradicional:
+
+$$
+\pm S \times B^{\pm E}
+$$
+
+Desglosando esta expresión bajo el estándar de 32 bits:
+- **$\pm$ (Signo, 1 bit):** Determina si el número es positivo ($0$) o negativo ($1$).
+- **$S$ (Mantisa, 23 bits):** Representa los dígitos de precisión. Se normaliza para obligar a que el número adquiera la forma $1.bbb...b$.
+- **$B$ (Base):** En el mundo de la ALU, la base siempre será $2$.
+- **$\pm E$ (Exponente, 8 bits):** Posee una representación sesgada para evitar exponentes binarios negativos. Se le suma un valor fijo llamado sesgo (BIAS), que para 32 bits es de $127$. 
+
+La expresión matemática fundamental que condensa el estándar y permite regresar de IEEE 754 a decimal es:
+
+$$
+(-1)^s \times 1.m \times 2^{e-127}
+$$
+
+**Limitaciones del Estándar:**
+Al tener un espacio finito de 32 bits, existen huecos de precisión y límites estrictos:
+- **Límites Positivos:** Desde $2^{-127}$ hasta $(2 - 2^{-23}) \times 2^{128}$.
+- **Límites Negativos:** Desde $-(2 - 2^{-23}) \times 2^{128}$ hasta $-2^{-127}$.
+
+Exceder estos límites genera errores de *Overflow* o *Underflow*. También existen representaciones especiales como $0^+$, $0^-$, infinito ($+\infty$, $-\infty$) y el estado *NaN* (Not a Number).
+
+* 3. Pasos Lógicos de Resolución (Ej: -248.75)
+1. **Identificar el bit de signo:** Como $-248.75$ es negativo, el bit es $1$.
+2. **Convertir a binario sin signo:** La parte entera ($248$) y la fraccionaria ($0.75$) nos dan $11111000.11$.
+3. **Normalización:** Movemos la coma $7$ espacios a la izquierda para dejar un solo $1$: $1.111100011 \times 2^7$.
+4. **Ajustar el sesgo:** Al exponente ($7$) le sumamos $127$, resultando en $134$.
+5. **Convertir el exponente:** $134$ en binario de 8 bits es $10000110$.
+6. **Construir la mantisa:** Tomamos los bits a la derecha de la coma ($111100011$).
+7. **Completar con ceros:** Llenamos a la derecha hasta los $23$ bits.
+Resultado final: =1 10000110 11110001100000000000000=
+
+* 4. Lógica e Implementación Interactiva en Python
+Para cumplir con los requerimientos de interacción sin detener la compilación de la página HTML, el siguiente código utiliza el concepto de *Tangling*. Al compilar el sitio web, Emacs exportará automáticamente este código a un archivo llamado =conversor_ieee754.py= que podrá ejecutarse desde cualquier terminal.
+
+El script incluye un bucle =while= infinito que evalúa mediante un =try-except= si el número ingresado por el usuario cumple con los límites de 32 bits predefinidos. 
+
+#+begin_src python :session :tangle conversor_ieee754.py :results silent :exports code
+def obtener_signo(numero):
+    """Devuelve '1' si es negativo, '0' si es positivo."""
+    return "1" if numero < 0 else "0"
+
+def entero_a_binario(entero):
+    """Convierte la parte entera a binario dividiendo sucesivamente para 2."""
+    if entero == 0: return "0"
+    binario = ""
+    while entero > 0:
+        binario = str(entero % 2) + binario
+        entero = entero // 2
+    return binario
+
+def fraccion_a_binario(fraccion, precision=50):
+    """Multiplica sucesivamente la fracción por 2 para extraer los bits."""
+    binario = ""
+    while fraccion > 0 and len(binario) < precision:
+        fraccion *= 2
+        bit = int(fraccion)
+        binario += str(bit)
+        fraccion -= bit
+    return binario if binario else "0"
+
+def normalizar_y_exponente(binario_entero, binario_fraccion):
+    """Desplaza la coma, calcula el exponente sesgado y ajusta la mantisa a 23 bits."""
+    if binario_entero == "0" and "1" not in binario_fraccion:
+        return "00000000", "0" * 23
+
+    # Desplazamiento de la coma
+    if binario_entero != "0":
+        exponente = len(binario_entero) - 1
+        mantisa_cruda = binario_entero[1:] + binario_fraccion
+    else:
+        indice_uno = binario_fraccion.find("1")
+        exponente = -(indice_uno + 1)
+        mantisa_cruda = binario_fraccion[indice_uno + 1:]
+
+    # Suma del sesgo (127) y formato
+    bin_exponente = bin(exponente + 127)[2:].zfill(8)
+    mantisa_final = mantisa_cruda.ljust(23, '0')[:23]
+
+    return bin_exponente, mantisa_final
+
+def convertir_a_ieee754(numero):
+    """Ensambla el Signo, Exponente y Mantisa."""
+    if numero == 0.0:
+        return "0 00000000 00000000000000000000000"
+        
+    signo = obtener_signo(numero)
+    num_abs = abs(numero)
+    entero = int(num_abs)
+    fraccion = num_abs - entero
+    
+    bin_entero = entero_a_binario(entero)
+    bin_fraccion = fraccion_a_binario(fraccion)
+    
+    exponente, mantisa = normalizar_y_exponente(bin_entero, bin_fraccion)
+    return f"{signo} {exponente} {mantisa}"
+#+end_src
+
+#+begin_src python :tangle conversor_ieee754.py :eval never :exports code
+def consola_interactiva():
+    """Bucle principal de validación y captura de datos por consola."""
+    MAX_FLOAT_32 = 3.4028235e38
+    MIN_FLOAT_32 = 1.17549435e-38
+    
+    print("--- Conversor Decimal a IEEE 754 (32 bits) ---")
+    while True:
+        entrada = input("Ingrese un numero decimal (o 'q' para salir): ")
+        if entrada.lower() == 'q':
+            break
+        try:
+            numero = float(entrada)
+            # Validación estricta del rango
+            if numero != 0.0 and (abs(numero) > MAX_FLOAT_32 or abs(numero) < MIN_FLOAT_32):
+                print("Error: El numero excede los limites de 32 bits (Overflow/Underflow). Intente de nuevo.\n")
+                continue
+            
+            resultado = convertir_a_ieee754(numero)
+            print(f"IEEE 754: {resultado}\n")
+        except ValueError:
+            print("Error: Ingrese un valor numerico valido.\n")
+
+if __name__ == "__main__":
+    consola_interactiva()
+#+end_src
+
+* 5. Demostración de Funcionalidad
+Dado que la web actúa como un documento estático, a continuación se presentan los resultados directos de la ejecución del algoritmo de conversión para comprobar su fiabilidad con datos de prueba:
+
+#+begin_src python :session :results output :exports both
+# Se realiza una prueba emulando los datos de la función extraída en el Tangle
+numeros_de_prueba = [-248.75, 2.0, 0.085]
+
+for num in numeros_de_prueba:
+    print(f"Decimal: {num}")
+    print(f"IEEE 754: {convertir_a_ieee754(num)}\n")
+#+end_src
+
+#+RESULTS:
+: Decimal: -248.75
+: IEEE 754: 1 10000110 11110001100000000000000
+: 
+: Decimal: 2.0
+: IEEE 754: 0 10000000 00000000000000000000000
+: 
+: Decimal: 0.085
+: IEEE 754: 0 01111011 01011100001010001111010
+
+* 6. Conversor Interactivo (Frontend)
+A continuación, puedes probar la conversión directamente en la página web. 
+
+#+begin_export html
+<div style="background-color: #f4f4f4; padding: 20px; border-radius: 8px; margin-top: 20px;">
+    <label for="numeroDecimal"><strong>Ingrese un número decimal:</strong></label>
+    <input type="text" id="numeroDecimal" placeholder="Ej. -248.75" style="padding: 5px; margin-left: 10px;">
+    <button onclick="procesarIEEE()" style="padding: 5px 15px; cursor: pointer; background-color: #333; color: white; border: none; border-radius: 4px;">Convertir</button>
+    
+    <!-- Zona para mensajes al usuario -->
+    <div id="mensajeUsuario" style="margin-top: 15px; font-weight: bold;"></div>
+    
+    <!-- Zona para el resultado exitoso -->
+    <div id="resultadoBits" style="margin-top: 10px; font-family: monospace; font-size: 16px; background-color: #e8e8e8; padding: 10px; border-radius: 4px; display: none;"></div>
+</div>
+
+<script>
+// --- Lógica Matemática traducida a JavaScript ---
+const enteroABinario = (entero) => {
+    if (entero === 0) return "0";
+    let binario = "";
+    while (entero > 0) {
+        binario = (entero % 2).toString() + binario;
+        entero = Math.floor(entero / 2);
+    }
+    return binario;
+};
+
+const fraccionABinario = (fraccion) => {
+    let binario = "";
+    let iteraciones = 0;
+    while (fraccion > 0 && iteraciones < 50) {
+        fraccion *= 2;
+        let bit = Math.floor(fraccion);
+        binario += bit.toString();
+        fraccion -= bit;
+        iteraciones++;
+    }
+    return binario === "" ? "0" : binario;
+};
+
+const normalizarYExponente = (binEntero, binFraccion) => {
+    if (binEntero === "0" && !binFraccion.includes("1")) {
+        return ["00000000", "0".repeat(23)];
+    }
+    
+    let exponente = 0;
+    let mantisaCruda = "";
+    
+    if (binEntero !== "0") {
+        exponente = binEntero.length - 1;
+        mantisaCruda = binEntero.substring(1) + binFraccion;
+    } else {
+        let indiceUno = binFraccion.indexOf("1");
+        exponente = -(indiceUno + 1);
+        mantisaCruda = binFraccion.substring(indiceUno + 1);
+    }
+    
+    let exponenteSesgado = exponente + 127;
+    let binExponente = exponenteSesgado.toString(2).padStart(8, '0');
+    
+    let mantisaFinal = mantisaCruda.padEnd(23, '0').substring(0, 23);
+    return [binExponente, mantisaFinal];
+};
+
+const procesarIEEE = () => {
+    const input = document.getElementById("numeroDecimal").value;
+    const contenedorMensaje = document.getElementById("mensajeUsuario");
+    const contenedorResultado = document.getElementById("resultadoBits");
+
+    // Ocultar resultados previos
+    contenedorResultado.style.display = "none";
+
+    // Validación 1: Si no es un número
+    if (isNaN(input) || input.trim() === "") {
+        contenedorMensaje.style.color = "orange";
+        contenedorMensaje.innerText = "⚠️ Advertencia: Por favor, ingresa un número decimal válido.";
+        return;
+    }
+
+    const numero = parseFloat(input);
+
+    // Validación 2: Límites de 32 bits
+    const MAX_FLOAT_32 = 3.4028235e38;
+    const MIN_FLOAT_32 = 1.17549435e-38;
+    
+    if (numero !== 0 && (Math.abs(numero) > MAX_FLOAT_32 || Math.abs(numero) < MIN_FLOAT_32)) {
+        contenedorMensaje.style.color = "red";
+        contenedorMensaje.innerText = "❌ Error: El número excede los límites de 32 bits (Overflow/Underflow).";
+        return;
+    }
+
+    // Ejecución del algoritmo
+    const signo = numero < 0 ? "1" : "0";
+    const numAbs = Math.abs(numero);
+    const entero = Math.floor(numAbs);
+    const fraccion = numAbs - entero;
+
+    const binEntero = enteroABinario(entero);
+    const binFraccion = fraccionABinario(fraccion);
+    
+    const [exponente, mantisa] = normalizarYExponente(binEntero, binFraccion);
+    
+    // Si el número es 0, forzar todo a ceros
+    const resultadoFinal = (numero === 0) 
+        ? "0 00000000 00000000000000000000000" 
+        : `${signo} ${exponente} ${mantisa}`;
+
+    // Mostrar resultados
+    contenedorMensaje.style.color = "green";
+    contenedorMensaje.innerText = "✅ Conversión realizada con éxito.";
+    
+    contenedorResultado.style.display = "block";
+    contenedorResultado.innerHTML = `
+        <strong>Signo:</strong> ${signo} <br>
+        <strong>Exponente:</strong> ${exponente} <br>
+        <strong>Mantisa:</strong> ${mantisa} <br><br>
+        <strong>IEEE 754:</strong> ${resultadoFinal}
+    `;
+};
+</script>
+#+end_export

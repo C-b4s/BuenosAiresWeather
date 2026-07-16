@@ -21,6 +21,8 @@ las destrezas obtenidas durante el transcurso de la asignatura de
 2. Conocimientos de Emacs/Jupyter
 3. Configuración de Entorno para Data Science con Mamba/Anaconda
 4. Literate Programming
+
+* Índice de Secciones del Proyecto
  
 ** Estructura del proyecto
 nSe recomienda que el proyecto se cree en el /home/ del sistema
@@ -444,6 +446,8 @@ cp -rfv ./images/* ~/BuenosAiresWeather/weather-site/public/images
 | './images/temperature.png' | -> | '/home/stevenech/BuenosAiresWeather/weather-site/public/images/temperature.png' |
 | './images/wind_speed.png'  | -> | '/home/stevenech/BuenosAiresWeather/weather-site/public/images/wind_speed.png'  |
 
+* Sección: Conversión a IEEE 754
+- [[file:ieee754.org][Ir a la sección de Conversión IEEE 754]]
 * Referencias
 - [[https://emacs.stackexchange.com/questions/28715/get-pandas-data-frame-as-a-table-in-org-babel][presentar dataframe como tabla en emacs org]]
 - [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-python.html][Python Source Code Blocks in Org Mode]]
