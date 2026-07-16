@@ -3,8 +3,7 @@
 # FUENTE CONSULTADA:
 # - Conda Env Scripting: https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
 
-
-# Cargar conda de forma segura usando bash desde mi usuario (martinpr)
+# Cargar conda de forma segura usando bash desde $HOME
 if [ -f ~/miniforge3/etc/profile.d/conda.sh ]; then
     source ~/miniforge3/etc/profile.d/conda.sh
 elif [ -f ~/miniconda3/etc/profile.d/conda.sh ]; then
