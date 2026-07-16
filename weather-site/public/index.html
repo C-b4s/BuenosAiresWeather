@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-07-16 Thu 00:52 -->
+<!-- 2026-07-16 Thu 07:06 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Proyecto ICCD332 Arquitectura de Computadores</title>
@@ -50,37 +50,74 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org40cba5e">1. City Weather APP</a></li>
-<li><a href="#orgb3e49e8">2. Índice de Secciones del Proyecto</a>
+<li><a href="#org8f613bd">1. City Weather APP</a></li>
+<li><a href="#orgfd2f79b">2. Índice de Secciones del Proyecto</a>
 <ul>
-<li><a href="#org5203794">2.1. Estructura del proyecto</a></li>
-<li><a href="#org849defd">2.2. Formulación del Problema</a></li>
-<li><a href="#org06da817">2.3. Descripción del código</a>
+<li><a href="#orgfd29137">2.1. Estructura del proyecto</a></li>
+<li><a href="#org384cbbc">2.2. Formulación del Problema</a></li>
+<li><a href="#org91824de">2.3. Descripción del código</a>
 <ul>
-<li><a href="#org14e48b4">2.3.1. Lectura del API</a></li>
-<li><a href="#orga773f62">2.3.2. Convertir <i>Json</i> a <i>Diccionario</i> de Python (Normalización)</a></li>
-<li><a href="#org042eb80">2.3.3. Guardar el archivo csv</a></li>
+<li><a href="#org3061f84">2.3.1. Lectura del API</a></li>
+<li><a href="#orgfe9db6d">2.3.2. Convertir <i>Json</i> a <i>Diccionario</i> de Python (Normalización)</a></li>
+<li><a href="#orged0cb29">2.3.3. Guardar el archivo csv</a></li>
 </ul>
 </li>
-<li><a href="#org1e652bd">2.4. Script ejecutable sh</a></li>
-<li><a href="#orgded5d86">2.5. Configuración de Crontab</a></li>
+<li><a href="#org7f9e474">2.4. Script ejecutable sh</a></li>
+<li><a href="#orgd5f6288">2.5. Configuración de Crontab</a></li>
 </ul>
 </li>
-<li><a href="#orgc18c84f">3. Presentación de resultados</a>
+<li><a href="#orgaa6b604">3. Presentación de resultados</a>
 <ul>
-<li><a href="#orgd5307c8">3.1. Muestra Aleatoria de datos</a></li>
-<li><a href="#org3fb87c2">3.2. Gráfica Temperatura vs Tiempo</a></li>
-<li><a href="#orge5cf68b">3.3. Gráfica Humedad vs Tiempo</a></li>
-<li><a href="#org40ded4f">3.4. Gráfica Velocidad del Viento vs Tiempo</a></li>
+<li><a href="#orgf952df9">3.1. Muestra Aleatoria de datos</a></li>
+<li><a href="#orgb8a11b5">3.2. Gráfica Temperatura vs Tiempo</a></li>
+<li><a href="#org69a8538">3.3. Gráfica Humedad vs Tiempo</a></li>
+<li><a href="#org100ff9b">3.4. Gráfica Velocidad del Viento vs Tiempo</a></li>
 </ul>
 </li>
-<li><a href="#org799c608">4. Sección: Conversión a IEEE 754</a></li>
-<li><a href="#org4501673">5. Referencias</a></li>
+<li><a href="#org20950ae">4. Sección: Conversión a IEEE 754</a></li>
+<li><a href="#org660b90b">5. Referencias</a>
+<ul>
+<li><a href="#orgfb34cfb">5.1. Limpieza y Procesamiento de Datos</a>
+<ul>
+<li><a href="#org1596fae">5.1.1. Librerías y Variables Globales</a></li>
+<li><a href="#org2356f74">5.1.2. Utilidades y Validación</a></li>
+<li><a href="#orgfd1247c">5.1.3. Pipeline de Procesamiento Funcional</a></li>
+<li><a href="#org5685638">5.1.4. Ejecución del Script y Escritura</a></li>
+</ul>
+</li>
+<li><a href="#org79e10ed">5.2. Análisis de Datos</a></li>
+<li><a href="#orgb8ae392">5.3. Gráficas Estadísticas</a>
+<ul>
+<li><a href="#orgba1dfc6">5.3.1. Gráfica Denuncias vs Tiempo</a></li>
+<li><a href="#org5192ea6">5.3.2. Gráfica Top 5 Cantones</a></li>
+</ul>
+</li>
+<li><a href="#org6d0513c">5.4. 1. Introducción Teórica</a></li>
+<li><a href="#org8e97a7f">5.5. 2. Estructura Matemática y Limitaciones</a></li>
+<li><a href="#org62ff8ed">5.6. 3. Pasos Lógicos de Resolución (Ej: -248.75)</a></li>
+<li><a href="#org486feba">5.7. 4. Lógica e Implementación Interactiva en Python</a></li>
+<li><a href="#orgec8cf69">5.8. 5. Demostración de Funcionalidad</a></li>
+<li><a href="#org8ab3c89">5.9. 6. Conversor Interactivo (Frontend)</a></li>
+<li><a href="#orgfa52827">5.10. Datos del clima en Buenos Aires</a>
+<ul>
+<li><a href="#orgdd9f33b">5.10.1. Código utilizado</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org40cba5e" class="outline-2">
-<h2 id="org40cba5e"><span class="section-number-2">1.</span> City Weather APP</h2>
+<nav>
+  <ul>
+    <li><a href="#procesamiento-robos">Procesamiento de Robos</a></li>
+    <li><a href="#ieee-754">IEEE 754</a></li>
+    <li><a href="#buenos-aires-weather">Buenos Aires Weather</a></li>
+  </ul>
+</nav>
+
+<div id="outline-container-org8f613bd" class="outline-2">
+<h2 id="org8f613bd"><span class="section-number-2">1.</span> City Weather APP</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Este es el proyecto de fin de semestre en donde se pretende demostrar
@@ -97,12 +134,12 @@ las destrezas obtenidas durante el transcurso de la asignatura de
 </div>
 </div>
 
-<div id="outline-container-orgb3e49e8" class="outline-2">
-<h2 id="orgb3e49e8"><span class="section-number-2">2.</span> Índice de Secciones del Proyecto</h2>
+<div id="outline-container-orgfd2f79b" class="outline-2">
+<h2 id="orgfd2f79b"><span class="section-number-2">2.</span> Índice de Secciones del Proyecto</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org5203794" class="outline-3">
-<h3 id="org5203794"><span class="section-number-3">2.1.</span> Estructura del proyecto</h3>
+<div id="outline-container-orgfd29137" class="outline-3">
+<h3 id="orgfd29137"><span class="section-number-3">2.1.</span> Estructura del proyecto</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 nSe recomienda que el proyecto se cree en el <i>home</i> del sistema
@@ -127,7 +164,7 @@ subdirectorios. Adaptar los nombres de los archivos según las ciudades
 específicas del grupo.
 </p>
 
-<pre class="example" id="org4a0beac">
+<pre class="example" id="org204c8b0">
 .
 ├── CityTemperatureAnalysis.ipynb
 ├── clima-quito-hoy.csv
@@ -192,11 +229,25 @@ tree
 
 6 directories, 0 files
 </pre>
+
+
+<p>
+Una vez realizadas las demás secciones del presente proyecto, se
+procedió a actualizar la organización de los direcctorios
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span style="font-weight: bold;">pwd</span>
+<span style="font-weight: bold;">cd</span> ~/BuenosAiresWeather/
+cp build.* ~/BuenosAiresWeather/weather-site/
+cp -r ~/BuenosAiresWeather/weather-site/content/images/ ~/BuenosAiresWeather/weather-site/public/
+</pre>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org849defd" class="outline-3">
-<h3 id="org849defd"><span class="section-number-3">2.2.</span> Formulación del Problema</h3>
+<div id="outline-container-org384cbbc" class="outline-3">
+<h3 id="org384cbbc"><span class="section-number-3">2.2.</span> Formulación del Problema</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Se desea realizar un registro climatológico de una ciudad
@@ -253,8 +304,11 @@ simple-httpd</li>
 </ul>
 
 <div class="org-src-container">
-<pre class="src src-elisp">(<span style="font-weight: bold;">use-package</span> simple-httpd
+<pre class="src src-elisp">
+(package-install 'simple-httpd)
+(<span style="font-weight: bold;">use-package</span> simple-httpd
    <span style="font-weight: bold;">:ensure</span> t)
+(package-installed-p 'simple-httpd)
 </pre>
 </div>
 
@@ -269,8 +323,8 @@ dirección será remitida en la contestación de la tarea</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org06da817" class="outline-3">
-<h3 id="org06da817"><span class="section-number-3">2.3.</span> Descripción del código</h3>
+<div id="outline-container-org91824de" class="outline-3">
+<h3 id="org91824de"><span class="section-number-3">2.3.</span> Descripción del código</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 En esta sección se detalla la estrategia de solución adoptada para el
@@ -278,8 +332,8 @@ procesamiento dinámico y almacenamiento del clima de Buenos Aires.
 </p>
 </div>
 
-<div id="outline-container-org14e48b4" class="outline-4">
-<h4 id="org14e48b4"><span class="section-number-4">2.3.1.</span> Lectura del API</h4>
+<div id="outline-container-org3061f84" class="outline-4">
+<h4 id="org3061f84"><span class="section-number-4">2.3.1.</span> Lectura del API</h4>
 <div class="outline-text-4" id="text-2-3-1">
 <p>
 Para obtener los datos climáticos de Buenos Aires en tiempo real, se
@@ -306,8 +360,8 @@ longitud configurados para unidades métricas (°C y m/s).
 </div>
 </div>
 
-<div id="outline-container-orga773f62" class="outline-4">
-<h4 id="orga773f62"><span class="section-number-4">2.3.2.</span> Convertir <i>Json</i> a <i>Diccionario</i> de Python (Normalización)</h4>
+<div id="outline-container-orgfe9db6d" class="outline-4">
+<h4 id="orgfe9db6d"><span class="section-number-4">2.3.2.</span> Convertir <i>Json</i> a <i>Diccionario</i> de Python (Normalización)</h4>
 <div class="outline-text-4" id="text-2-3-2">
 <p>
 La respuesta que nos da la API viene en un formato llamado JSON y la
@@ -329,8 +383,8 @@ para saber exactamente cuándo se tomaron los datos.
 </div>
 </div>
 
-<div id="outline-container-org042eb80" class="outline-4">
-<h4 id="org042eb80"><span class="section-number-4">2.3.3.</span> Guardar el archivo csv</h4>
+<div id="outline-container-orged0cb29" class="outline-4">
+<h4 id="orged0cb29"><span class="section-number-4">2.3.3.</span> Guardar el archivo csv</h4>
 <div class="outline-text-4" id="text-2-3-3">
 <p>
 Para asegurarnos de que el programa no falle si faltan datos (como cuando no está lloviendo), el script primero revisa si el archivo CSV ya existe en la carpeta. Si el archivo ya está creado, lo abre y le pega los datos nuevos al final para no borrar lo que guardaron tus compañeros[cite: 2]. Si el archivo no existe, lo crea por primera vez.
@@ -354,8 +408,8 @@ Para asegurarnos de que el programa no falle si faltan datos (como cuando no est
 </div>
 
 
-<div id="outline-container-org1e652bd" class="outline-3">
-<h3 id="org1e652bd"><span class="section-number-3">2.4.</span> Script ejecutable sh</h3>
+<div id="outline-container-org7f9e474" class="outline-3">
+<h3 id="org7f9e474"><span class="section-number-3">2.4.</span> Script ejecutable sh</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 Se coloca el contenido del script ejecutable. Para evitar fallos con
@@ -456,8 +510,8 @@ Finalmente convierta en ejecutable como se explicó en clases y laboratorio
 </div>
 </div>
 
-<div id="outline-container-orgded5d86" class="outline-3">
-<h3 id="orgded5d86"><span class="section-number-3">2.5.</span> Configuración de Crontab</h3>
+<div id="outline-container-orgd5f6288" class="outline-3">
+<h3 id="orgd5f6288"><span class="section-number-3">2.5.</span> Configuración de Crontab</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 Se indica la configuración realizada en crontab para la adquisición de
@@ -478,8 +532,8 @@ del programa como los errores en la ejecución.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc18c84f" class="outline-2">
-<h2 id="orgc18c84f"><span class="section-number-2">3.</span> Presentación de resultados</h2>
+<div id="outline-container-orgaa6b604" class="outline-2">
+<h2 id="orgaa6b604"><span class="section-number-2">3.</span> Presentación de resultados</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Para la pressentación de resultados se utilizan las librerías de Python:
@@ -498,8 +552,8 @@ necesario que realice la instalación de los paquetes usando <code>mamba
 install &lt;nombre-paquete&gt;</code>
 </p>
 </div>
-<div id="outline-container-orgd5307c8" class="outline-3">
-<h3 id="orgd5307c8"><span class="section-number-3">3.1.</span> Muestra Aleatoria de datos</h3>
+<div id="outline-container-orgf952df9" class="outline-3">
+<h3 id="orgf952df9"><span class="section-number-3">3.1.</span> Muestra Aleatoria de datos</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Se presenta una muestra de 10 valores aleatorios de los datos obtenidos.
@@ -919,8 +973,8 @@ Resultado del número de filas y columnas leídos del archivo csv
 </div>
 </div>
 
-<div id="outline-container-org3fb87c2" class="outline-3">
-<h3 id="org3fb87c2"><span class="section-number-3">3.2.</span> Gráfica Temperatura vs Tiempo</h3>
+<div id="outline-container-orgb8a11b5" class="outline-3">
+<h3 id="orgb8a11b5"><span class="section-number-3">3.2.</span> Gráfica Temperatura vs Tiempo</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
@@ -943,7 +997,7 @@ fname
 </div>
 
 
-<div id="org42ca320" class="figure">
+<div id="org50e333d" class="figure">
 <p><img src="./images/temperature.png" alt="temperature.png" />
 </p>
 <p><span class="figure-number">Figura 1: </span>Gráfica Temperatura vs Tiempo</p>
@@ -952,8 +1006,8 @@ fname
 </div>
 
 
-<div id="outline-container-orge5cf68b" class="outline-3">
-<h3 id="orge5cf68b"><span class="section-number-3">3.3.</span> Gráfica Humedad vs Tiempo</h3>
+<div id="outline-container-org69a8538" class="outline-3">
+<h3 id="org69a8538"><span class="section-number-3">3.3.</span> Gráfica Humedad vs Tiempo</h3>
 <div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
@@ -976,7 +1030,7 @@ fname
 </div>
 
 
-<div id="org8d23954" class="figure">
+<div id="orga58d33b" class="figure">
 <p><img src="./images/humidity.png" alt="humidity.png" />
 </p>
 </div>
@@ -984,8 +1038,8 @@ fname
 </div>
 
 
-<div id="outline-container-org40ded4f" class="outline-3">
-<h3 id="org40ded4f"><span class="section-number-3">3.4.</span> Gráfica Velocidad del Viento vs Tiempo</h3>
+<div id="outline-container-org100ff9b" class="outline-3">
+<h3 id="org100ff9b"><span class="section-number-3">3.4.</span> Gráfica Velocidad del Viento vs Tiempo</h3>
 <div class="outline-text-3" id="text-3-4">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
@@ -1008,7 +1062,7 @@ fname
 </div>
 
 
-<div id="org91b5f0d" class="figure">
+<div id="orgb9541c1" class="figure">
 <p><img src="./images/wind_speed.png" alt="wind_speed.png" />
 </p>
 </div>
@@ -1029,16 +1083,16 @@ equivalente en <code>/public/images</code>
 </div>
 </div>
 
-<div id="outline-container-org799c608" class="outline-2">
-<h2 id="org799c608"><span class="section-number-2">4.</span> Sección: Conversión a IEEE 754</h2>
+<div id="outline-container-org20950ae" class="outline-2">
+<h2 id="org20950ae"><span class="section-number-2">4.</span> Sección: Conversión a IEEE 754</h2>
 <div class="outline-text-2" id="text-4">
 <ul class="org-ul">
 <li><a href="ieee754.html">Ir a la sección de Conversión IEEE 754</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org4501673" class="outline-2">
-<h2 id="org4501673"><span class="section-number-2">5.</span> Referencias</h2>
+<div id="outline-container-org660b90b" class="outline-2">
+<h2 id="org660b90b"><span class="section-number-2">5.</span> Referencias</h2>
 <div class="outline-text-2" id="text-5">
 <ul class="org-ul">
 <li><a href="https://emacs.stackexchange.com/questions/28715/get-pandas-data-frame-as-a-table-in-org-babel">presentar dataframe como tabla en emacs org</a></li>
@@ -1056,15 +1110,17 @@ equivalente en <code>/public/images</code>
 Recuerde que su máquina ha de disponer de un entorno de
 anaconda/mamba denominado iccd332 en el cual se dispone del interprete
 de Python
-</p></div></div>
+</p>
+
+<section id="procesamiento-robos"></div></div>
 
 
 </div>
 </div></div>
 <div id="postamble" class="status">
-<p class="date">Fecha: 2026-07-12</p>
+<p class="date">Fecha: 2026-07-16</p>
 <p class="author">Autor: Echeverría Steven, Jami Mateo, Pérez Martín y Zúñiga Sebastián.</p>
-<p class="date">Created: 2026-07-16 Thu 00:52</p>
+<p class="date">Created: 2026-07-16 Thu 07:06</p>
 </div>
 </body>
 </html>
