@@ -23,7 +23,7 @@ las destrezas obtenidas durante el transcurso de la asignatura de
 4. Literate Programming
  
 ** Estructura del proyecto
-Se recomienda que el proyecto se cree en el /home/ del sistema
+nSe recomienda que el proyecto se cree en el /home/ del sistema
 operativo i.e. /home/<user>/. Allí se creará la carpeta /CityWeather/
 #+begin_src shell :results output :exports both
 mkdir BuenosAiresWeather
@@ -243,7 +243,7 @@ Poner comando/s aquí
 Se indica la configuración realizada en crontab para la adquisición de datos
 
 #+begin_src shell
-*/t * * * * cd <City>Weather && ./get-weather.sh >> output.log 2>&1
+*/15 * * * * cd BuenosAiresWeather && ./get-weather.sh >> output.log 2>&1
 #+end_src
 
 - Recuerde remplazar <City> por el nombre de la ciudad que analice
@@ -262,20 +262,23 @@ casos, para que funcione los siguientes bloques de código, es
 necesario que realice la instalación de los paquetes usando ~mamba
 install <nombre-paquete>~
 ** Muestra Aleatoria de datos
-Presentar una muestra de 10 valores aleatorios de los datos obtenidos.
+Se presenta una muestra de 10 valores aleatorios de los datos obtenidos.
 #+caption: Lectura de archivo csv
 #+begin_src python :session :results output exports both
 import os
 import pandas as pd
 # lectura del archivo csv obtenido
-df = pd.read_csv('/home/leningfe/PythonProjects/QuitoWeather/clima-quito-hoy-etl.csv')
+df = pd.read_csv('/home/stevenech/BuenosAiresWeather/clima-buenosaires-hoy.csv')
 # se imprime la estructura del dataframe en forma de filas x columnas
 print(df.shape)
 #+end_src
 
-Resultado del número de filas y columnas leídos del archivo csv
 #+RESULTS:
-: (57, 30)
+: (11, 27)
+
+Resultado del número de filas y columnas leídos del archivo csv
+
+
 #+caption: Despliegue de datos aleatorios
 #+begin_src python :session :exports both :results value table :return table
 table1 = df.sample(10)
@@ -283,33 +286,27 @@ table = [list(table1)]+[None]+table1.values.tolist()
 #+end_src
 
 #+RESULTS:
-| dt                  | coord_lon | coord_lat | weather_0_id | weather_0_main | weather_0_description | weather_0_icon | base     | main_temp | main_feels_like | main_temp_min | main_temp_max | main_pressure | main_humidity | main_sea_level | main_grnd_level | visibility | wind_speed | wind_deg | wind_gust | clouds_all | sys_type | sys_id | sys_country | sys_sunrise         | sys_sunset          | timezone |      id | name  | cod |
-|---------------------+-----------+-----------+--------------+----------------+-----------------------+----------------+----------+-----------+-----------------+---------------+---------------+---------------+---------------+----------------+-----------------+------------+------------+----------+-----------+------------+----------+--------+-------------+---------------------+---------------------+----------+---------+-------+-----|
-| 2024-08-03 21:57:57 |  -78.5249 |   -0.2299 |          804 | Clouds         | overcast clouds       | 04n            | stations |      8.53 |            8.53 |          8.53 |          8.53 |          1019 |            90 |           1019 |             724 |      10000 |       0.78 |       75 |      1.58 |         97 |        1 |   8555 | EC          | 2024-08-03 06:17:01 | 2024-08-03 18:23:24 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-04 10:26:16 |   -78.525 |   -0.2299 |          804 | Clouds         | overcast clouds       | 04d            | stations |     16.53 |           15.57 |         16.53 |         16.53 |          1016 |            51 |           1016 |             728 |      10000 |       1.11 |        6 |       2.1 |         90 |        1 |   8555 | EC          | 2024-08-04 06:16:56 | 2024-08-04 18:23:19 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-04 09:15:02 |  -78.5249 |   -0.2299 |          804 | Clouds         | overcast clouds       | 04d            | stations |     14.53 |           13.61 |         14.53 |         14.53 |          1018 |            60 |           1018 |             726 |      10000 |       0.73 |       90 |      1.81 |         86 |        1 |   8555 | EC          | 2024-08-04 06:16:56 | 2024-08-04 18:23:19 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-06 10:05:50 |  -78.5211 |   -0.2309 |          801 | Clouds         | few clouds            | 02d            | stations |     14.66 |           13.59 |         14.66 |         14.66 |          1017 |            54 |           1017 |             730 |      10000 |       1.01 |       25 |      1.74 |         15 |        1 |   8555 | EC          | 2024-08-06 06:16:44 | 2024-08-06 18:23:07 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-03 02:43:26 |  -78.5249 |   -0.2299 |          802 | Clouds         | scattered clouds      | 03n            | stations |      7.53 |            6.77 |          7.53 |          7.53 |          1019 |            81 |           1019 |             722 |      10000 |       1.55 |      171 |      1.97 |         44 |        1 |   8555 | EC          | 2024-08-03 06:17:01 | 2024-08-03 18:23:24 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-04 22:50:26 |  -78.5249 |   -0.2299 |          802 | Clouds         | scattered clouds      | 03n            | stations |      9.53 |            9.53 |          9.53 |          9.53 |          1020 |            93 |           1020 |             724 |      10000 |       1.18 |      117 |       1.4 |         38 |        1 |   8555 | EC          | 2024-08-04 06:16:56 | 2024-08-04 18:23:19 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-03 12:52:29 |  -78.5211 |   -0.2309 |          801 | Clouds         | few clouds            | 02d            | stations |     20.66 |           19.72 |         20.66 |         20.66 |          1012 |            36 |           1012 |             729 |      10000 |       4.05 |      341 |       5.7 |         17 |        1 |   8555 | EC          | 2024-08-03 06:17:00 | 2024-08-03 18:23:23 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-03 10:54:26 |  -78.5211 |   -0.2309 |          800 | Clear          | clear sky             | 01d            | stations |     15.66 |           14.12 |         15.66 |         15.66 |          1015 |            32 |           1015 |             730 |      10000 |       2.42 |      354 |       3.3 |         10 |        1 |   8555 | EC          | 2024-08-03 06:17:00 | 2024-08-03 18:23:23 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-02 23:51:42 |  -78.5211 |   -0.2309 |          803 | Clouds         | broken clouds         | 04n            | stations |      8.66 |            8.66 |          8.66 |          8.66 |          1020 |            88 |           1020 |             726 |       8882 |       1.17 |      146 |      1.32 |         68 |        1 |   8555 | EC          | 2024-08-02 06:17:04 | 2024-08-02 18:23:27 |   -18000 | 3652462 | Quito | 200 |
-| 2024-08-03 02:13:58 |  -78.5249 |   -0.2299 |          802 | Clouds         | scattered clouds      | 03n            | stations |      7.53 |            6.77 |          7.53 |          7.53 |          1019 |            85 |           1019 |             722 |      10000 |       1.55 |      160 |      1.87 |         26 |        1 |   8555 | EC          | 2024-08-03 06:17:01 | 2024-08-03 18:23:24 |   -18000 | 3652462 | Quito | 200 |
+| weather                                                                          | base     | visibility | dt                  | timezone |      id | name        | cod | coord.lon | coord.lat | main.temp | main.feels_like | main.temp_min | main.temp_max | main.pressure | main.humidity | main.sea_level | main.grnd_level | wind.speed | wind.deg | wind.gust | clouds.all | sys.type |  sys.id | sys.country | sys.sunrise | sys.sunset |
+|----------------------------------------------------------------------------------+----------+------------+---------------------+----------+---------+-------------+-----+-----------+-----------+-----------+-----------------+---------------+---------------+---------------+---------------+----------------+-----------------+------------+----------+-----------+------------+----------+---------+-------------+-------------+------------|
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 17:57:05 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     14.89 |           14.55 |         14.37 |         15.53 |          1009 |            81 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2008409 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 17:59:07 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.51 |           15.21 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 19:00:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     16.01 |           15.73 |         14.93 |         16.61 |          1009 |            79 |           1009 |            1008 |       0.45 |       45 |      1.79 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:30:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.76 |           15.48 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       45 |      1.79 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:45:02 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.82 |           15.55 |         14.88 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       45 |      1.79 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 16:48:02 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.23 |           14.87 |         13.82 |         16.05 |          1008 |            79 |           1008 |            1007 |       0.45 |       23 |      0.89 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 17:59:41 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.51 |           15.21 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:07:18 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.65 |           15.36 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       23 |      0.89 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:15:04 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.65 |           15.36 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       0.45 |       23 |      0.89 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
+| [{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}] | stations |      10000 | 2026-07-15 18:00:03 |   -10800 | 6693229 | San Nicolas | 200 |  -58.3816 |  -34.6037 |     15.51 |           15.21 |         14.37 |         16.61 |          1009 |            80 |           1009 |            1008 |       3.41 |       45 |      7.87 |        100 |        2 | 2031595 | AR          |  1784113074 | 1784149239 |
 
 ** Gráfica Temperatura vs Tiempo
-Realizar una gráfica de la Temperatura en el tiempo.
-
-
-El siguiente cógido permite hacer la gráfica de la temperatura vs
-tiempo para Org 9.7+. Para saber que versión dispone puede ejecutar
-~M-x org-version~
 
 #+begin_src python :results file :exports both :session
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 # Define el tamaño de la figura de salida
 fig = plt.figure(figsize=(8,6))
-plt.plot(df['dt'], df['main_temp']) # dibuja las variables dt y temperatura
+plt.plot(df['dt'], df['main.temp']) # dibuja las variables dt y temperatura
 # ajuste para presentacion de fechas en la imagen 
 plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=2))
 # plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  
@@ -327,21 +324,70 @@ fname
 #+RESULTS:
 [[file:./images/temperature.png]]
 
+
+** Gráfica Humedad vs Tiempo
+
+#+begin_src python :results file :exports both :session
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+# Define el tamaño de la figura de salida
+fig = plt.figure(figsize=(8,6))
+plt.plot(df['dt'], df['main.humidity']) # dibuja las variables dt y humedad
+# ajuste para presentacion de fechas en la imagen 
+plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=2))
+# plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  
+plt.grid()
+# Titulo que obtiene el nombre de la ciudad del DataFrame
+plt.title(f'Main Humidity vs Time in {next(iter(set(df.name)))}')
+plt.xticks(rotation=40) # rotación de las etiquetas 40°
+fig.tight_layout()
+fname = './images/humidity.png'
+plt.savefig(fname)
+fname
+#+end_src
+
+#+RESULTS:
+[[file:./images/humidity.png]]
+
+
+** Gráfica Velocidad del Viento vs Tiempo
+
+#+begin_src python :results file :exports both :session
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+# Define el tamaño de la figura de salida
+fig = plt.figure(figsize=(8,6))
+plt.plot(df['dt'], df['wind.speed']) # dibuja las variables dt y velocidad del viento
+# ajuste para presentacion de fechas en la imagen 
+plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=2))
+# plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  
+plt.grid()
+# Titulo que obtiene el nombre de la ciudad del DataFrame
+plt.title(f'Wind Speed vs Time in {next(iter(set(df.name)))}')
+plt.xticks(rotation=40) # rotación de las etiquetas 40°
+fig.tight_layout()
+fname = './images/wind_speed.png'
+plt.savefig(fname)
+fname
+#+end_src
+
+#+RESULTS:
+[[file:./images/wind_speed.png]]
+
+
 Debido a que el archivo index.org se abre dentro de la carpeta
 /content/, y en cambio el servidor http de emacs se ejecuta desde la
 carpeta /public/ es necesario copiar el archivo a la ubicación
 equivalente en ~/public/images~
 
 #+begin_src shell
-cp -rfv ./images/* /home/leningfe/PythonProjects/QuitoWeather/weather-site/public/images
+cp -rfv ./images/* ~/BuenosAiresWeather/weather-site/public/images
 #+end_src
 
 #+RESULTS:
-| './images/plot.png'        | -> | '/home/leningfe/PythonProjects/QuitoWeather/weather-site/public/images/plot.png'        |
-| './images/temperature.png' | -> | '/home/leningfe/PythonProjects/QuitoWeather/weather-site/public/images/temperature.png' |
-
-**  Realice una gráfica de Humedad con respecto al tiempo
-**  *Opcional* Presente alguna gráfica de interés.
+| './images/humidity.png'    | -> | '/home/stevenech/BuenosAiresWeather/weather-site/public/images/humidity.png'    |
+| './images/temperature.png' | -> | '/home/stevenech/BuenosAiresWeather/weather-site/public/images/temperature.png' |
+| './images/wind_speed.png'  | -> | '/home/stevenech/BuenosAiresWeather/weather-site/public/images/wind_speed.png'  |
 
 * Referencias
 - [[https://emacs.stackexchange.com/questions/28715/get-pandas-data-frame-as-a-table-in-org-babel][presentar dataframe como tabla en emacs org]]
