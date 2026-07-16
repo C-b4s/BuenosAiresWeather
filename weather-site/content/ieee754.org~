@@ -1,0 +1,30 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil expand-links:t f:t
+#+options: inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+options: tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+title: Conversión a IEEE 754
+#+date: 2026-07-12
+#+author: Mateo Jami
+#+email: mateo.jami@epn.edu.ec
+#+language: es
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 27.1 (Org mode 9.7.5)
+#+cite_export:
+
+[[file:index.org][Volver a la página principal]]
+
+* Conversión Decimal a IEEE 754 en Python
+En esta sección se desarrolla el algoritmo en Python para convertir números a su notación IEEE 754 de simple precisión (32 bits), detallando el signo, exponente y mantisa.
+
+** Código de Conversión
+#+begin_src python :session :results output exports both
+def float_to_ieee754(numero):
+    # Aquí desarrollaremos la lógica matemática 
+    resultado = "0 10000000 00000000000000000000000"
+    return resultado
+
+print("Ejemplo de conversión para el número 2.0:")
+print(float_to_ieee754(2.0))
+#+end_src
