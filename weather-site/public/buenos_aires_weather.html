@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-07-16 Thu 07:05 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>buenos_aires_weather</title>
+<meta name="author" content="Echeverría Steven, Jami Mateo, Pérez Martín y Zúñiga Sebastián." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">buenos<sub>aires</sub><sub>weather</sub></h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org6abb8e5">1. Datos del clima en Buenos Aires</a>
+<ul>
+<li><a href="#org85c9f48">1.1. Código utilizado</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org6abb8e5" class="outline-2">
+<h2 id="org6abb8e5"><span class="section-number-2">1.</span> Datos del clima en Buenos Aires</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+El siguiente código permitió generar un conjunto de registros del
+clima en Buenos Aires, argentina. estos datos se obtienen cada 15
+minutos desde la API de openweathermap.
+</p>
+</div>
+
+<div id="outline-container-org85c9f48" class="outline-3">
+<h3 id="org85c9f48"><span class="section-number-3">1.1.</span> Código utilizado</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Para realizar este procedimiento, se empleó el siguiente código de
+Python:
+</p>
+
+
+<p>
+Definición de variables e imports necesarios:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold;">import</span> os
+<span style="font-weight: bold;">import</span> requests
+<span style="font-weight: bold;">import</span> pandas <span style="font-weight: bold;">as</span> pd
+<span style="font-weight: bold;">from</span> datetime <span style="font-weight: bold;">import</span> datetime
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">FUENTES CONSULTADAS:
+</span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">- OpenWeatherMap Current Weather: https://openweathermap.org/current
+</span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">- Pandas json_normalize: https://pandas.pydata.org/docs/reference/api/pandas.json_normalize.html
+</span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">- Pandas concat: https://pandas.pydata.org/docs/reference/api/pandas.concat.html
+</span>
+<span style="font-weight: bold; font-style: italic;">API_KEY</span> = <span style="font-style: italic;">"62d2107136670bd7f62c2c23cea30130"</span>
+<span style="font-weight: bold; font-style: italic;">LAT</span> = -34.6037
+<span style="font-weight: bold; font-style: italic;">LON</span> = -58.3816
+</pre>
+</div>
+
+<p>
+Procesamiento de datos con fecha y hora. Además, en esta sección se
+guarda los datos en un archivo .csv:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Unidades m&#233;tricas (C&#176; y m/s)
+</span><span style="font-weight: bold; font-style: italic;">URL</span> = f<span style="font-style: italic;">"https://api.openweathermap.org/data/2.5/weather?lat=</span>{LAT}<span style="font-style: italic;">&amp;lon=</span>{LON}<span style="font-style: italic;">&amp;appid=</span>{API_KEY}<span style="font-style: italic;">&amp;units=metric"</span>
+
+<span style="font-weight: bold;">try</span>:
+
+    <span style="font-weight: bold; font-style: italic;">response</span> = requests.get(URL)
+    response.raise_for_status()
+    <span style="font-weight: bold; font-style: italic;">data</span> = response.json()
+    <span style="font-weight: bold; font-style: italic;">df_new</span> = pd.json_normalize(data)
+    <span style="font-weight: bold; font-style: italic;">df_new</span>[<span style="font-style: italic;">'dt'</span>] = datetime.now().strftime(<span style="font-style: italic;">'%Y-%m-%d %H:%M:%S'</span>)
+
+    <span style="font-weight: bold;">try</span>:
+        <span style="font-weight: bold; font-style: italic;">script_dir</span> = os.path.dirname(os.path.abspath(__file__))
+    <span style="font-weight: bold;">except</span> <span style="font-weight: bold; text-decoration: underline;">NameError</span>:
+        <span style="font-weight: bold; font-style: italic;">script_dir</span> = os.getcwd()
+
+    <span style="font-weight: bold; font-style: italic;">csv_path</span> = os.path.join(script_dir, <span style="font-style: italic;">'clima-buenosaires-hoy.csv'</span>)
+
+    <span style="font-weight: bold;">if</span> os.path.exists(csv_path):
+        <span style="font-weight: bold; font-style: italic;">df_existing</span> = pd.read_csv(csv_path)
+        <span style="font-weight: bold; font-style: italic;">df_all</span> = pd.concat([df_existing, df_new], ignore_index=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+        df_all.to_csv(csv_path, index=<span style="font-weight: bold; text-decoration: underline;">False</span>)
+    <span style="font-weight: bold;">else</span>:
+        df_new.to_csv(csv_path, index=<span style="font-weight: bold; text-decoration: underline;">False</span>)
+
+    <span style="font-weight: bold;">print</span>(<span style="font-style: italic;">"Datos meteorol&#243;gicos de Buenos Aires agregados con &#233;xito"</span>)
+
+<span style="font-weight: bold;">except</span> <span style="font-weight: bold; text-decoration: underline;">Exception</span> <span style="font-weight: bold;">as</span> e:
+    <span style="font-weight: bold;">print</span>(f<span style="font-style: italic;">"Error en la ejecuci&#243;n: </span>{e}<span style="font-style: italic;">"</span>)
+</pre>
+</div>
+
+<p>
+Luego, se creó un archivo denominado get-weather.sh para obtener los
+datos del clima en Buenos Aires, Argentina cada 15 minutos. Los
+resultados producidos por el mismo se guardan en el archivo clima-buenosaires-hoy.csvwe :
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span style="font-weight: bold;">with-temp-buffer</span>
+  (insert-file-contents <span style="font-style: italic;">"~/BuenosAiresWeather/clima-buenosaires-hoy.csv"</span>)
+  (mapcar (<span style="font-weight: bold;">lambda</span> (line)
+            (split-string line <span style="font-style: italic;">","</span>))
+          (split-string (buffer-string) <span style="font-style: italic;">"\n"</span> t)))
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2026-07-16</p>
+<p class="author">Author: Echeverría Steven, Jami Mateo, Pérez Martín y Zúñiga Sebastián.</p>
+<p class="date">Created: 2026-07-16 Thu 07:05</p>
+</div>
+</body>
+</html>

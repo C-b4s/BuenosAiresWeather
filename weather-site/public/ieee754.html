@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-07-16 Thu 00:52 -->
+<!-- 2026-07-16 Thu 07:05 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Conversión a IEEE 754</title>
@@ -50,12 +50,12 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org430dcd3">1. 1. Introducción Teórica</a></li>
-<li><a href="#orga06833d">2. 2. Estructura Matemática y Limitaciones</a></li>
-<li><a href="#orge29044e">3. 3. Pasos Lógicos de Resolución (Ej: -248.75)</a></li>
-<li><a href="#orgd1ebaf9">4. 4. Lógica e Implementación Interactiva en Python</a></li>
-<li><a href="#org8470294">5. 5. Demostración de Funcionalidad</a></li>
-<li><a href="#org72e069b">6. 6. Conversor Interactivo (Frontend)</a></li>
+<li><a href="#orgb4aa93f">1. 1. Introducción Teórica</a></li>
+<li><a href="#orgb87d3b5">2. 2. Estructura Matemática y Limitaciones</a></li>
+<li><a href="#org4d02dde">3. 3. Pasos Lógicos de Resolución (Ej: -248.75)</a></li>
+<li><a href="#org1cdba76">4. 4. Lógica e Implementación Interactiva en Python</a></li>
+<li><a href="#orgaee0c5d">5. 5. Demostración de Funcionalidad</a></li>
+<li><a href="#orgcae8593">6. 6. Conversor Interactivo (Frontend)</a></li>
 </ul>
 </div>
 </div>
@@ -63,8 +63,8 @@
 <a href="index.html">Volver a la página principal</a>
 </p>
 
-<div id="outline-container-org430dcd3" class="outline-2">
-<h2 id="org430dcd3"><span class="section-number-2">1.</span> 1. Introducción Teórica</h2>
+<div id="outline-container-orgb4aa93f" class="outline-2">
+<h2 id="orgb4aa93f"><span class="section-number-2">1.</span> 1. Introducción Teórica</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 En la computación, representaciones tradicionales como la coma fija o el complemento a 2 son excelentes para números enteros, pero no permiten representar números muy grandes o muy pequeños, como por ejemplo, el diámetro de la Tierra. Para solucionar esto, utilizamos la representación en coma flotante, regida mundialmente por el estándar IEEE 754.
@@ -76,8 +76,8 @@ En nuestra vida cotidiana utilizamos el Sistema Decimal (base 10). Sin embargo, 
 </div>
 </div>
 
-<div id="outline-container-orga06833d" class="outline-2">
-<h2 id="orga06833d"><span class="section-number-2">2.</span> 2. Estructura Matemática y Limitaciones</h2>
+<div id="outline-container-orgb87d3b5" class="outline-2">
+<h2 id="orgb87d3b5"><span class="section-number-2">2.</span> 2. Estructura Matemática y Limitaciones</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 La expresión general para la representación en coma flotante binaria es la versión informática de la notación científica tradicional:
@@ -124,8 +124,8 @@ Exceder estos límites genera errores de <b>Overflow</b> o <b>Underflow</b>. Tam
 </div>
 </div>
 
-<div id="outline-container-orge29044e" class="outline-2">
-<h2 id="orge29044e"><span class="section-number-2">3.</span> 3. Pasos Lógicos de Resolución (Ej: -248.75)</h2>
+<div id="outline-container-org4d02dde" class="outline-2">
+<h2 id="org4d02dde"><span class="section-number-2">3.</span> 3. Pasos Lógicos de Resolución (Ej: -248.75)</h2>
 <div class="outline-text-2" id="text-3">
 <ol class="org-ol">
 <li><b><b>Identificar el bit de signo:</b></b> Como \(-248.75\) es negativo, el bit es \(1\).</li>
@@ -142,8 +142,8 @@ Resultado final: <code>1 10000110 11110001100000000000000</code>
 </div>
 </div>
 
-<div id="outline-container-orgd1ebaf9" class="outline-2">
-<h2 id="orgd1ebaf9"><span class="section-number-2">4.</span> 4. Lógica e Implementación Interactiva en Python</h2>
+<div id="outline-container-org1cdba76" class="outline-2">
+<h2 id="org1cdba76"><span class="section-number-2">4.</span> 4. Lógica e Implementación Interactiva en Python</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Para cumplir con los requerimientos de interacción sin detener la compilación de la página HTML, el siguiente código utiliza el concepto de <b>Tangling</b>. Al compilar el sitio web, Emacs exportará automáticamente este código a un archivo llamado <code>conversor_ieee754.py</code> que podrá ejecutarse desde cualquier terminal.
@@ -245,8 +245,8 @@ El script incluye un bucle <code>while</code> infinito que evalúa mediante un <
 </div>
 </div>
 
-<div id="outline-container-org8470294" class="outline-2">
-<h2 id="org8470294"><span class="section-number-2">5.</span> 5. Demostración de Funcionalidad</h2>
+<div id="outline-container-orgaee0c5d" class="outline-2">
+<h2 id="orgaee0c5d"><span class="section-number-2">5.</span> 5. Demostración de Funcionalidad</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Dado que la web actúa como un documento estático, a continuación se presentan los resultados directos de la ejecución del algoritmo de conversión para comprobar su fiabilidad con datos de prueba:
@@ -275,8 +275,8 @@ IEEE 754: 0 01111011 01011100001010001111010
 </div>
 </div>
 
-<div id="outline-container-org72e069b" class="outline-2">
-<h2 id="org72e069b"><span class="section-number-2">6.</span> 6. Conversor Interactivo (Frontend)</h2>
+<div id="outline-container-orgcae8593" class="outline-2">
+<h2 id="orgcae8593"><span class="section-number-2">6.</span> 6. Conversor Interactivo (Frontend)</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 A continuación, puedes probar la conversión directamente en la página web. 
@@ -405,7 +405,7 @@ const procesarIEEE = () => {
 <div id="postamble" class="status">
 <p class="date">Fecha: 2026-07-12</p>
 <p class="author">Autor: Mateo Jami</p>
-<p class="date">Created: 2026-07-16 Thu 00:52</p>
+<p class="date">Created: 2026-07-16 Thu 07:05</p>
 </div>
 </body>
 </html>

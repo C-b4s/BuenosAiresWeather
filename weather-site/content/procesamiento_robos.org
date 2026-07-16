@@ -321,3 +321,9 @@ fname
 
 #+RESULTS:
 [[file:./images/denuncias_canton.png]]
+
+#+BEGIN_export html
+<script>
+console.log("Bloque JavaScript desde procesamiento-robos.org cargado y ejecutado.");
+</script>
+#+END_export

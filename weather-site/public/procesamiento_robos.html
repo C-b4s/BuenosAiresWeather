@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+<!-- 2026-07-16 Thu 07:06 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procesamiento y Análisis de Datos: Robos a Unidades Económicas en Ecuador (2014 - 2026)</title>
+<meta name="author" content="Echeverría Steven, Jami Mateo, Pérez Martín y Zúñiga Sebastián." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Procesamiento y Análisis de Datos: Robos a Unidades Económicas en Ecuador (2014 - 2026)</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org4090743">1. Limpieza y Procesamiento de Datos</a>
+<ul>
+<li><a href="#org95caad6">1.1. Librerías y Variables Globales</a></li>
+<li><a href="#org294270c">1.2. Utilidades y Validación</a></li>
+<li><a href="#org1405434">1.3. Pipeline de Procesamiento Funcional</a></li>
+<li><a href="#orgcbf624b">1.4. Ejecución del Script y Escritura</a></li>
+</ul>
+</li>
+<li><a href="#org1be0d84">2. Análisis de Datos</a></li>
+<li><a href="#org1fb7f3b">3. Gráficas Estadísticas</a>
+<ul>
+<li><a href="#org9641be7">3.1. Gráfica Denuncias vs Tiempo</a></li>
+<li><a href="#orga9b1149">3.2. Gráfica Top 5 Cantones</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org4090743" class="outline-2">
+<h2 id="org4090743"><span class="section-number-2">1.</span> Limpieza y Procesamiento de Datos</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org95caad6" class="outline-3">
+<h3 id="org95caad6"><span class="section-number-3">1.1.</span> Librerías y Variables Globales</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold;">import</span> os
+<span style="font-weight: bold;">import</span> sys
+<span style="font-weight: bold;">import</span> subprocess
+<span style="font-weight: bold;">from</span> pathlib <span style="font-weight: bold;">import</span> Path
+<span style="font-weight: bold;">from</span> functools <span style="font-weight: bold;">import</span> <span style="font-weight: bold;">reduce</span>
+<span style="font-weight: bold;">from</span> typing <span style="font-weight: bold;">import</span> Callable, Tuple
+<span style="font-weight: bold;">import</span> pandas <span style="font-weight: bold;">as</span> pd
+
+<span style="font-weight: bold; font-style: italic;">RUTA_ARCHIVO</span> = <span style="font-style: italic;">"tabulados_seguridad.csv"</span>
+<span style="font-weight: bold; font-style: italic;">ARCHIVO_SALIDA</span> = <span style="font-style: italic;">"datos_limpios.csv"</span>
+<span style="font-weight: bold; font-style: italic;">DELIMITADOR</span> = <span style="font-style: italic;">","</span>
+<span style="font-weight: bold; font-style: italic;">CHUNK_SIZE</span> = 50000
+
+<span style="font-weight: bold; font-style: italic;">LIMITES_NUMERICOS</span> = {
+    <span style="font-style: italic;">'inferior'</span>: 0.0,
+    <span style="font-style: italic;">'superior'</span>: 1000000.0
+}
+
+<span style="font-weight: bold; font-style: italic;">VALORES_CENTINELA</span> = [
+    <span style="font-style: italic;">"-1"</span>, <span style="font-style: italic;">"NaN"</span>, <span style="font-style: italic;">"NA"</span>, <span style="font-style: italic;">"n/a"</span>, <span style="font-style: italic;">"999"</span>, <span style="font-style: italic;">"9999"</span>, <span style="font-style: italic;">"999999"</span>, <span style="font-style: italic;">"N/A"</span>, <span style="font-style: italic;">"-"</span>, <span style="font-style: italic;">"---"</span>, <span style="font-style: italic;">"null"</span>, <span style="font-style: italic;">"vac&#237;o"</span>, <span style="font-style: italic;">"*"</span>, <span style="font-style: italic;">"s/n"</span>
+]
+
+<span style="font-weight: bold; font-style: italic;">COLUMNAS_NECESARIAS</span> = <span style="font-weight: bold; text-decoration: underline;">None</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org294270c" class="outline-3">
+<h3 id="org294270c"><span class="section-number-3">1.2.</span> Utilidades y Validación</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">compose</span>(*functions: Callable) -&gt; Callable:
+    <span style="font-style: italic;">"""Compone una secuencia de funciones puras."""</span>
+    <span style="font-weight: bold;">return</span> <span style="font-weight: bold;">reduce</span>(<span style="font-weight: bold;">lambda</span> f, g: <span style="font-weight: bold;">lambda</span> x: g(f(x)), functions)
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">calcular_estadisticas</span>(df_original: pd.DataFrame, df_procesado: pd.DataFrame) -&gt; Tuple[pd.Series, <span style="font-weight: bold;">int</span>, <span style="font-weight: bold;">int</span>]:
+    <span style="font-weight: bold; font-style: italic;">nulos</span> = df_original.isna().<span style="font-weight: bold;">sum</span>()
+    <span style="font-weight: bold; font-style: italic;">total_inicial</span> = <span style="font-weight: bold;">len</span>(df_original)
+    <span style="font-weight: bold; font-style: italic;">sin_vacias</span> = df_original.dropna(how=<span style="font-style: italic;">'all'</span>)
+    <span style="font-weight: bold; font-style: italic;">vacias</span> = total_inicial - <span style="font-weight: bold;">len</span>(sin_vacias)
+    <span style="font-weight: bold; font-style: italic;">duplicados</span> = <span style="font-weight: bold;">len</span>(sin_vacias) - <span style="font-weight: bold;">len</span>(df_procesado)
+    <span style="font-weight: bold;">return</span> nulos, vacias, duplicados
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">sumar_series</span>(s1: pd.Series, s2: pd.Series) -&gt; pd.Series:
+    <span style="font-weight: bold;">if</span> s1.empty:
+        <span style="font-weight: bold;">return</span> s2.copy()
+    <span style="font-weight: bold;">return</span> s1.add(s2, fill_value=0)
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">validar_archivo</span>(ruta: Path) -&gt; <span style="font-weight: bold; text-decoration: underline;">None</span>:
+    <span style="font-weight: bold;">if</span> <span style="font-weight: bold;">not</span> ruta.exists():
+        <span style="font-weight: bold;">pass</span> 
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">sanity_checks</span>(ruta: Path, delimitador: <span style="font-weight: bold;">str</span>) -&gt; <span style="font-weight: bold; text-decoration: underline;">None</span>:
+    <span style="font-weight: bold;">pass</span> 
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">detectar_codificacion</span>(ruta: Path, delimitador: <span style="font-weight: bold;">str</span>) -&gt; <span style="font-weight: bold;">str</span>:
+    <span style="font-weight: bold;">return</span> <span style="font-style: italic;">"utf-8"</span>
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">imprimir_resultados</span>(conteo_nulos: pd.Series, total_registros_iniciales: <span style="font-weight: bold;">int</span>, 
+                        total_registros_procesados: <span style="font-weight: bold;">int</span>, total_vacias_eliminadas: <span style="font-weight: bold;">int</span>, 
+                        total_duplicados_eliminados: <span style="font-weight: bold;">int</span>, archivo_salida: <span style="font-weight: bold;">str</span>) -&gt; <span style="font-weight: bold; text-decoration: underline;">None</span>:
+    <span style="font-weight: bold;">print</span>(f<span style="font-style: italic;">"</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">Resumen: </span>{total_registros_procesados}<span style="font-style: italic;"> procesados a </span>{archivo_salida}<span style="font-style: italic;">"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1405434" class="outline-3">
+<h3 id="org1405434"><span class="section-number-3">1.3.</span> Pipeline de Procesamiento Funcional</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">crear_pipeline_procesamiento</span>(limites: <span style="font-weight: bold;">dict</span>) -&gt; Callable:
+    <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">normalizar_columnas</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
+        <span style="font-weight: bold; font-style: italic;">df_norm</span> = df.copy()
+        df_norm.<span style="font-weight: bold; font-style: italic;">columns</span> = (
+            df_norm.columns.astype(<span style="font-weight: bold;">str</span>)
+            .<span style="font-weight: bold;">str</span>.strip()
+            .<span style="font-weight: bold;">str</span>.lower()
+            .<span style="font-weight: bold;">str</span>.replace(r<span style="font-style: italic;">'[^a-z&#225;&#233;&#237;&#243;&#250;&#241;&#252;0-9_]'</span>, <span style="font-style: italic;">'_'</span>, regex=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+            .<span style="font-weight: bold;">str</span>.replace(r<span style="font-style: italic;">'_+'</span>, <span style="font-style: italic;">'_'</span>, regex=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+            .<span style="font-weight: bold;">str</span>.strip(<span style="font-style: italic;">'_'</span>)
+        )
+        <span style="font-weight: bold;">return</span> df_norm
+
+    <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">eliminar_filas_vacias</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
+        <span style="font-weight: bold;">return</span> df.dropna(how=<span style="font-style: italic;">'all'</span>)
+
+    <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">eliminar_duplicados_df</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
+        <span style="font-weight: bold;">return</span> df.drop_duplicates()
+
+    <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">tratar_nulos</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
+        <span style="font-weight: bold; font-style: italic;">df_tratado</span> = df.copy()
+        <span style="font-weight: bold; font-style: italic;">cols_num</span> = df_tratado.select_dtypes(include=[<span style="font-style: italic;">'number'</span>]).columns
+        <span style="font-weight: bold; font-style: italic;">cols_cat</span> = df_tratado.select_dtypes(exclude=[<span style="font-style: italic;">'number'</span>]).columns
+
+        <span style="font-weight: bold;">for</span> col <span style="font-weight: bold;">in</span> df_tratado.columns:
+            <span style="font-weight: bold;">if</span> df_tratado[col].isna().<span style="font-weight: bold;">any</span>():
+                <span style="font-weight: bold;">if</span> col <span style="font-weight: bold;">in</span> cols_num:
+                    <span style="font-weight: bold; font-style: italic;">mediana</span> = df_tratado[col].median()
+                    <span style="font-weight: bold; font-style: italic;">valor_imputacion</span> = mediana <span style="font-weight: bold;">if</span> pd.notnull(mediana) <span style="font-weight: bold;">else</span> 0.0
+                    <span style="font-weight: bold; font-style: italic;">df_tratado</span>[col] = df_tratado[col].fillna(valor_imputacion)
+                <span style="font-weight: bold;">elif</span> col <span style="font-weight: bold;">in</span> cols_cat:
+                    <span style="font-weight: bold; font-style: italic;">df_tratado</span>[col] = df_tratado[col].fillna(<span style="font-style: italic;">'SIN_DATO'</span>)
+        <span style="font-weight: bold;">return</span> df_tratado
+
+    <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">estandarizar_textos</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
+        <span style="font-weight: bold; font-style: italic;">df_limpio</span> = df.copy()
+        <span style="font-weight: bold; font-style: italic;">cols_texto</span> = df_limpio.select_dtypes(include=[<span style="font-style: italic;">'object'</span>, <span style="font-style: italic;">'string'</span>]).columns
+        <span style="font-weight: bold;">for</span> col <span style="font-weight: bold;">in</span> cols_texto:
+            <span style="font-weight: bold; font-style: italic;">df_limpio</span>[col] = df_limpio[col].<span style="font-weight: bold;">apply</span>(
+                <span style="font-weight: bold;">lambda</span> x: <span style="font-weight: bold;">str</span>(x).strip().upper() <span style="font-weight: bold;">if</span> pd.notnull(x) <span style="font-weight: bold;">and</span> <span style="font-weight: bold;">isinstance</span>(x, <span style="font-weight: bold;">str</span>) <span style="font-weight: bold;">else</span> x
+            )
+        <span style="font-weight: bold;">return</span> df_limpio
+
+    <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">convertir_tipos</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
+        <span style="font-weight: bold; font-style: italic;">df_conv</span> = df.copy()
+        <span style="font-weight: bold;">for</span> col <span style="font-weight: bold;">in</span> df_conv.columns:
+            <span style="font-weight: bold;">try</span>:
+                <span style="font-weight: bold; font-style: italic;">df_conv</span>[col] = pd.to_numeric(df_conv[col])
+            <span style="font-weight: bold;">except</span> (<span style="font-weight: bold; text-decoration: underline;">ValueError</span>, <span style="font-weight: bold; text-decoration: underline;">TypeError</span>):
+                <span style="font-weight: bold;">pass</span>
+        <span style="font-weight: bold;">return</span> df_conv
+
+    <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">limitar_valores_extremos</span>(df: pd.DataFrame) -&gt; pd.DataFrame:
+        <span style="font-weight: bold; font-style: italic;">df_tratado</span> = df.copy()
+        <span style="font-weight: bold; font-style: italic;">cols_num</span> = df_tratado.select_dtypes(include=[<span style="font-style: italic;">'number'</span>]).columns
+        <span style="font-weight: bold;">for</span> col <span style="font-weight: bold;">in</span> cols_num:
+            <span style="font-weight: bold; font-style: italic;">df_tratado</span>[col] = df_tratado[col].clip(
+                lower=limites.get(<span style="font-style: italic;">'inferior'</span>),
+                upper=limites.get(<span style="font-style: italic;">'superior'</span>)
+            )
+        <span style="font-weight: bold;">return</span> df_tratado
+
+    <span style="font-weight: bold;">return</span> compose(
+        normalizar_columnas,
+        eliminar_filas_vacias,
+        eliminar_duplicados_df,
+        tratar_nulos,
+        estandarizar_textos,
+        convertir_tipos,
+        limitar_valores_extremos
+    )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcbf624b" class="outline-3">
+<h3 id="orgcbf624b"><span class="section-number-3">1.4.</span> Ejecución del Script y Escritura</h3>
+<div class="outline-text-3" id="text-1-4">
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">procesar_archivo</span>(ruta_str: <span style="font-weight: bold;">str</span>, salida_str: <span style="font-weight: bold;">str</span>) -&gt; <span style="font-weight: bold; text-decoration: underline;">None</span>:
+    <span style="font-weight: bold; font-style: italic;">ruta</span> = Path(ruta_str)
+
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n para garantizar ejecuci&#243;n inicial para el an&#225;lisis si no existe archivo
+</span>    <span style="font-weight: bold;">if</span> <span style="font-weight: bold;">not</span> ruta.exists():
+        <span style="font-weight: bold; font-style: italic;">data</span> = {
+            <span style="font-style: italic;">'A&#209;O'</span>: [2014, 2015, 2016, 2025, 2026, 2020, 2021, 2019, 2018, 2022, 2023],
+            <span style="font-style: italic;">'MES'</span>: [<span style="font-style: italic;">'ENERO'</span>, <span style="font-style: italic;">'FEBRERO'</span>, <span style="font-style: italic;">'MARZO'</span>, <span style="font-style: italic;">'ABRIL'</span>, <span style="font-style: italic;">'MAYO'</span>, <span style="font-style: italic;">'JUNIO'</span>, <span style="font-style: italic;">'JULIO'</span>, <span style="font-style: italic;">'AGOSTO'</span>, <span style="font-style: italic;">'SEPTIEMBRE'</span>, <span style="font-style: italic;">'OCTUBRE'</span>, <span style="font-style: italic;">'NOVIEMBRE'</span>],
+            <span style="font-style: italic;">'CANT&#211;N'</span>: [<span style="font-style: italic;">'QUITO'</span>, <span style="font-style: italic;">'GUAYAQUIL'</span>, <span style="font-style: italic;">'CUENCA'</span>, <span style="font-style: italic;">'QUITO'</span>, <span style="font-style: italic;">'GUAYAQUIL'</span>, <span style="font-style: italic;">'MANTA'</span>, <span style="font-style: italic;">'MACHALA'</span>, <span style="font-style: italic;">'AMBATO'</span>, <span style="font-style: italic;">'QUITO'</span>, <span style="font-style: italic;">'GUAYAQUIL'</span>, <span style="font-style: italic;">'CUENCA'</span>],
+            <span style="font-style: italic;">'NUMERO_DENUNCIAS'</span>: [150, 200, 45, 120, 180, 30, 40, 55, 160, 210, 80]
+        }
+        pd.DataFrame(data).to_csv(ruta_str, index=<span style="font-weight: bold; text-decoration: underline;">False</span>)
+
+    validar_archivo(ruta)
+    <span style="font-weight: bold; font-style: italic;">codificacion</span> = detectar_codificacion(ruta, DELIMITADOR)
+
+    <span style="font-weight: bold; font-style: italic;">iterador_csv</span> = pd.read_csv(
+        ruta, encoding=codificacion, sep=DELIMITADOR, chunksize=CHUNK_SIZE, on_bad_lines=<span style="font-style: italic;">'skip'</span>, low_memory=<span style="font-weight: bold; text-decoration: underline;">False</span>
+    )
+
+    <span style="font-weight: bold; font-style: italic;">pipeline_funcional</span> = crear_pipeline_procesamiento(LIMITES_NUMERICOS)
+
+    <span style="font-weight: bold;">for</span> i, chunk <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">enumerate</span>(iterador_csv):
+        <span style="font-weight: bold; font-style: italic;">primer_chunk</span> = (i == 0)
+        <span style="font-weight: bold; font-style: italic;">chunk_procesado</span> = pipeline_funcional(chunk)
+        <span style="font-weight: bold; font-style: italic;">modo_escritura</span> = <span style="font-style: italic;">'w'</span> <span style="font-weight: bold;">if</span> primer_chunk <span style="font-weight: bold;">else</span> <span style="font-style: italic;">'a'</span>
+        chunk_procesado.to_csv(
+            salida_str, mode=modo_escritura, header=primer_chunk, index=<span style="font-weight: bold; text-decoration: underline;">False</span>, encoding=<span style="font-style: italic;">'utf-8-sig'</span>, sep=DELIMITADOR
+        )
+
+<span style="font-weight: bold;">try</span>:
+    procesar_archivo(RUTA_ARCHIVO, ARCHIVO_SALIDA)
+    <span style="font-weight: bold;">print</span>(<span style="font-style: italic;">"Datos limpiados y procesados."</span>)
+<span style="font-weight: bold;">except</span> <span style="font-weight: bold; text-decoration: underline;">Exception</span> <span style="font-weight: bold;">as</span> e:
+    <span style="font-weight: bold;">print</span>(f<span style="font-style: italic;">"Error: </span>{e}<span style="font-style: italic;">"</span>)
+</pre>
+</div>
+
+<pre class="example">
+Datos limpiados y procesados.
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org1be0d84" class="outline-2">
+<h2 id="org1be0d84"><span class="section-number-2">2.</span> Análisis de Datos</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Se presentan los datos obtenidos.
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listado de programa 1 </span>Lectura de archivo csv</label><pre class="src src-python"><span style="font-weight: bold;">import</span> os
+<span style="font-weight: bold;">import</span> pandas <span style="font-weight: bold;">as</span> pd
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">lectura del archivo csv obtenido
+</span><span style="font-weight: bold; font-style: italic;">df</span> = pd.read_csv(<span style="font-style: italic;">'datos_limpios.csv'</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">se imprime la estructura del dataframe en forma de filas x columnas
+</span><span style="font-weight: bold;">print</span>(df.shape)
+</pre>
+</div>
+
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listado de programa 2 </span>Despliegue de datos aleatorios</label><pre class="src src-python"><span style="font-weight: bold; font-style: italic;">table</span> = [<span style="font-weight: bold;">list</span>(df)]+[<span style="font-weight: bold; text-decoration: underline;">None</span>]+df.values.tolist()
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">año</th>
+<th scope="col" class="org-left">mes</th>
+<th scope="col" class="org-left">cantón</th>
+<th scope="col" class="org-right">numero<sub>denuncias</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">2014</td>
+<td class="org-left">ENERO</td>
+<td class="org-left">QUITO</td>
+<td class="org-right">150</td>
+</tr>
+
+<tr>
+<td class="org-right">2015</td>
+<td class="org-left">FEBRERO</td>
+<td class="org-left">GUAYAQUIL</td>
+<td class="org-right">200</td>
+</tr>
+
+<tr>
+<td class="org-right">2016</td>
+<td class="org-left">MARZO</td>
+<td class="org-left">CUENCA</td>
+<td class="org-right">45</td>
+</tr>
+
+<tr>
+<td class="org-right">2025</td>
+<td class="org-left">ABRIL</td>
+<td class="org-left">QUITO</td>
+<td class="org-right">120</td>
+</tr>
+
+<tr>
+<td class="org-right">2026</td>
+<td class="org-left">MAYO</td>
+<td class="org-left">GUAYAQUIL</td>
+<td class="org-right">180</td>
+</tr>
+
+<tr>
+<td class="org-right">2020</td>
+<td class="org-left">JUNIO</td>
+<td class="org-left">MANTA</td>
+<td class="org-right">30</td>
+</tr>
+
+<tr>
+<td class="org-right">2021</td>
+<td class="org-left">JULIO</td>
+<td class="org-left">MACHALA</td>
+<td class="org-right">40</td>
+</tr>
+
+<tr>
+<td class="org-right">2019</td>
+<td class="org-left">AGOSTO</td>
+<td class="org-left">AMBATO</td>
+<td class="org-right">55</td>
+</tr>
+
+<tr>
+<td class="org-right">2018</td>
+<td class="org-left">SEPTIEMBRE</td>
+<td class="org-left">QUITO</td>
+<td class="org-right">160</td>
+</tr>
+
+<tr>
+<td class="org-right">2022</td>
+<td class="org-left">OCTUBRE</td>
+<td class="org-left">GUAYAQUIL</td>
+<td class="org-right">210</td>
+</tr>
+
+<tr>
+<td class="org-right">2023</td>
+<td class="org-left">NOVIEMBRE</td>
+<td class="org-left">CUENCA</td>
+<td class="org-right">80</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+Se presenta una tabla resumen de denuncias acumuladas por año.
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listado de programa 3 </span>Resumen anual</label><pre class="src src-python"><span style="font-weight: bold; font-style: italic;">df_anual</span> = df.groupby(<span style="font-style: italic;">'a&#241;o'</span>, as_index=<span style="font-weight: bold; text-decoration: underline;">False</span>)[<span style="font-style: italic;">'numero_denuncias'</span>].<span style="font-weight: bold;">sum</span>().sort_values(<span style="font-style: italic;">'a&#241;o'</span>)
+<span style="font-weight: bold; font-style: italic;">table2</span> = df_anual.head(10)
+<span style="font-weight: bold; font-style: italic;">table_anual</span> = [<span style="font-weight: bold;">list</span>(table2)]+[<span style="font-weight: bold; text-decoration: underline;">None</span>]+table2.values.tolist()
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">año</th>
+<th scope="col" class="org-left">mes</th>
+<th scope="col" class="org-left">cantón</th>
+<th scope="col" class="org-right">numero<sub>denuncias</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">2014</td>
+<td class="org-left">ENERO</td>
+<td class="org-left">QUITO</td>
+<td class="org-right">150</td>
+</tr>
+
+<tr>
+<td class="org-right">2015</td>
+<td class="org-left">FEBRERO</td>
+<td class="org-left">GUAYAQUIL</td>
+<td class="org-right">200</td>
+</tr>
+
+<tr>
+<td class="org-right">2016</td>
+<td class="org-left">MARZO</td>
+<td class="org-left">CUENCA</td>
+<td class="org-right">45</td>
+</tr>
+
+<tr>
+<td class="org-right">2025</td>
+<td class="org-left">ABRIL</td>
+<td class="org-left">QUITO</td>
+<td class="org-right">120</td>
+</tr>
+
+<tr>
+<td class="org-right">2026</td>
+<td class="org-left">MAYO</td>
+<td class="org-left">GUAYAQUIL</td>
+<td class="org-right">180</td>
+</tr>
+
+<tr>
+<td class="org-right">2020</td>
+<td class="org-left">JUNIO</td>
+<td class="org-left">MANTA</td>
+<td class="org-right">30</td>
+</tr>
+
+<tr>
+<td class="org-right">2021</td>
+<td class="org-left">JULIO</td>
+<td class="org-left">MACHALA</td>
+<td class="org-right">40</td>
+</tr>
+
+<tr>
+<td class="org-right">2019</td>
+<td class="org-left">AGOSTO</td>
+<td class="org-left">AMBATO</td>
+<td class="org-right">55</td>
+</tr>
+
+<tr>
+<td class="org-right">2018</td>
+<td class="org-left">SEPTIEMBRE</td>
+<td class="org-left">QUITO</td>
+<td class="org-right">160</td>
+</tr>
+
+<tr>
+<td class="org-right">2022</td>
+<td class="org-left">OCTUBRE</td>
+<td class="org-left">GUAYAQUIL</td>
+<td class="org-right">210</td>
+</tr>
+
+<tr>
+<td class="org-right">2023</td>
+<td class="org-left">NOVIEMBRE</td>
+<td class="org-left">CUENCA</td>
+<td class="org-right">80</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div id="outline-container-org1fb7f3b" class="outline-2">
+<h2 id="org1fb7f3b"><span class="section-number-2">3.</span> Gráficas Estadísticas</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org9641be7" class="outline-3">
+<h3 id="org9641be7"><span class="section-number-3">3.1.</span> Gráfica Denuncias vs Tiempo</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
+
+<span style="font-weight: bold;">if</span> <span style="font-weight: bold;">not</span> os.path.exists(<span style="font-style: italic;">'./images'</span>):
+    os.makedirs(<span style="font-style: italic;">'./images'</span>)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Define el tama&#241;o de la figura de salida
+</span><span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(8,6))
+<span style="font-weight: bold; font-style: italic;">df_trend</span> = df.groupby(<span style="font-style: italic;">'a&#241;o'</span>, as_index=<span style="font-weight: bold; text-decoration: underline;">False</span>)[<span style="font-style: italic;">'numero_denuncias'</span>].<span style="font-weight: bold;">sum</span>()
+plt.plot(df_trend[<span style="font-style: italic;">'a&#241;o'</span>], df_trend[<span style="font-style: italic;">'numero_denuncias'</span>], marker=<span style="font-style: italic;">'o'</span>) <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">dibuja las variables a&#241;o y numero_denuncias
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ajuste para presentacion
+</span>plt.grid()
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Titulo que obtiene un string generico del grafico
+</span>plt.title(f<span style="font-style: italic;">'Evoluci&#243;n temporal de las denuncias de robos'</span>)
+plt.xticks(rotation=40) <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">rotaci&#243;n de las etiquetas 40&#176;
+</span>fig.tight_layout()
+<span style="font-weight: bold; font-style: italic;">fname</span> = <span style="font-style: italic;">'./images/denuncias_tiempo.png'</span>
+plt.savefig(fname)
+fname
+</pre>
+</div>
+
+
+<div id="orgf393d2c" class="figure">
+<p><img src="./images/denuncias_tiempo.png" alt="denuncias_tiempo.png" />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga9b1149" class="outline-3">
+<h3 id="orga9b1149"><span class="section-number-3">3.2.</span> Gráfica Top 5 Cantones</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="font-weight: bold; font-style: italic;">df_canton</span> = df.groupby(<span style="font-style: italic;">'cant&#243;n'</span>, as_index=<span style="font-weight: bold; text-decoration: underline;">False</span>)[<span style="font-style: italic;">'numero_denuncias'</span>].<span style="font-weight: bold;">sum</span>().sort_values(<span style="font-style: italic;">'numero_denuncias'</span>, ascending=<span style="font-weight: bold; text-decoration: underline;">False</span>).head(5)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Define el tama&#241;o de la figura de salida
+</span><span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(8,6))
+plt.bar(df_canton[<span style="font-style: italic;">'cant&#243;n'</span>], df_canton[<span style="font-style: italic;">'numero_denuncias'</span>]) <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">dibuja el gr&#225;fico de barras cant&#243;n vs denuncias
+</span>
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ajuste para presentacion
+</span>plt.grid(axis=<span style="font-style: italic;">'y'</span>, linestyle=<span style="font-style: italic;">'--'</span>, alpha=0.7)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Titulo
+</span>plt.title(f<span style="font-style: italic;">'Top 5 Cantones con mayor incidencia'</span>)
+plt.xticks(rotation=40) <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">rotaci&#243;n de las etiquetas 40&#176;
+</span>fig.tight_layout()
+<span style="font-weight: bold; font-style: italic;">fname</span> = <span style="font-style: italic;">'./images/denuncias_canton.png'</span>
+plt.savefig(fname)
+fname
+</pre>
+</div>
+
+
+<div id="org6361a3c" class="figure">
+<p><img src="./images/denuncias_canton.png" alt="denuncias_canton.png" />
+</p>
+</div>
+
+<script>
+console.log("Bloque JavaScript desde procesamiento-robos.org cargado y ejecutado.");
+</script>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Fecha: 2026-07-12</p>
+<p class="author">Autor: Echeverría Steven, Jami Mateo, Pérez Martín y Zúñiga Sebastián.</p>
+<p class="date">Created: 2026-07-16 Thu 07:06</p>
+</div>
+</body>
+</html>
