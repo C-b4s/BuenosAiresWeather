@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-07-16 Thu 08:38 -->
+<!-- 2026-07-17 Fri 15:59 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Procesamiento y Análisis de Datos: Robos a Unidades Económicas en Ecuador (2014 - 2026)</title>
@@ -18,31 +18,31 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf80d298">1. Limpieza y Procesamiento de Datos</a>
+<li><a href="#orgb2f49b8">1. Limpieza y Procesamiento de Datos</a>
 <ul>
-<li><a href="#org93e7c2c">1.1. Librerías y Variables Globales</a></li>
-<li><a href="#org1d7aa40">1.2. Utilidades y Validación</a></li>
-<li><a href="#orga44c304">1.3. Pipeline de Procesamiento Funcional</a></li>
-<li><a href="#orgf6c47da">1.4. Ejecución del Script y Escritura</a></li>
+<li><a href="#orgc905536">1.1. Librerías y Variables Globales</a></li>
+<li><a href="#orgc266f29">1.2. Utilidades y Validación</a></li>
+<li><a href="#org49efffc">1.3. Pipeline de Procesamiento Funcional</a></li>
+<li><a href="#org9b88740">1.4. Ejecución del Script y Escritura</a></li>
 </ul>
 </li>
-<li><a href="#org3aa51c0">2. Análisis de Datos</a></li>
-<li><a href="#orgffb97bb">3. Gráficas Estadísticas</a>
+<li><a href="#org26a19cd">2. Análisis de Datos</a></li>
+<li><a href="#org51e2711">3. Gráficas Estadísticas</a>
 <ul>
-<li><a href="#orgb829722">3.1. Gráfica Denuncias vs Tiempo</a></li>
-<li><a href="#org05681c1">3.2. Gráfica Top 5 Cantones</a></li>
+<li><a href="#orge52f7ba">3.1. Gráfica Denuncias vs Tiempo</a></li>
+<li><a href="#org416758c">3.2. Gráfica Top 5 Cantones</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf80d298" class="outline-2">
-<h2 id="orgf80d298"><span class="section-number-2">1.</span> Limpieza y Procesamiento de Datos</h2>
+<div id="outline-container-orgb2f49b8" class="outline-2">
+<h2 id="orgb2f49b8"><span class="section-number-2">1.</span> Limpieza y Procesamiento de Datos</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org93e7c2c" class="outline-3">
-<h3 id="org93e7c2c"><span class="section-number-3">1.1.</span> Librerías y Variables Globales</h3>
+<div id="outline-container-orgc905536" class="outline-3">
+<h3 id="orgc905536"><span class="section-number-3">1.1.</span> Librerías y Variables Globales</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold;">import</span> os
@@ -73,8 +73,8 @@
 </div>
 </div>
 
-<div id="outline-container-org1d7aa40" class="outline-3">
-<h3 id="org1d7aa40"><span class="section-number-3">1.2.</span> Utilidades y Validación</h3>
+<div id="outline-container-orgc266f29" class="outline-3">
+<h3 id="orgc266f29"><span class="section-number-3">1.2.</span> Utilidades y Validación</h3>
 <div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">compose</span>(*functions: Callable) -&gt; Callable:
@@ -113,8 +113,8 @@
 </div>
 </div>
 
-<div id="outline-container-orga44c304" class="outline-3">
-<h3 id="orga44c304"><span class="section-number-3">1.3.</span> Pipeline de Procesamiento Funcional</h3>
+<div id="outline-container-org49efffc" class="outline-3">
+<h3 id="org49efffc"><span class="section-number-3">1.3.</span> Pipeline de Procesamiento Funcional</h3>
 <div class="outline-text-3" id="text-1-3">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">crear_pipeline_procesamiento</span>(limites: <span style="font-weight: bold;">dict</span>) -&gt; Callable:
@@ -193,8 +193,8 @@
 </div>
 </div>
 
-<div id="outline-container-orgf6c47da" class="outline-3">
-<h3 id="orgf6c47da"><span class="section-number-3">1.4.</span> Ejecución del Script y Escritura</h3>
+<div id="outline-container-org9b88740" class="outline-3">
+<h3 id="org9b88740"><span class="section-number-3">1.4.</span> Ejecución del Script y Escritura</h3>
 <div class="outline-text-3" id="text-1-4">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">procesar_archivo</span>(ruta_str: <span style="font-weight: bold;">str</span>, salida_str: <span style="font-weight: bold;">str</span>) -&gt; <span style="font-weight: bold; text-decoration: underline;">None</span>:
@@ -243,8 +243,8 @@ Datos limpiados y procesados.
 </div>
 
 
-<div id="outline-container-org3aa51c0" class="outline-2">
-<h2 id="org3aa51c0"><span class="section-number-2">2.</span> Análisis de Datos</h2>
+<div id="outline-container-org26a19cd" class="outline-2">
+<h2 id="org26a19cd"><span class="section-number-2">2.</span> Análisis de Datos</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Se presentan los datos obtenidos.
@@ -481,12 +481,12 @@ Se presenta una tabla resumen de denuncias acumuladas por año.
 </div>
 
 
-<div id="outline-container-orgffb97bb" class="outline-2">
-<h2 id="orgffb97bb"><span class="section-number-2">3.</span> Gráficas Estadísticas</h2>
+<div id="outline-container-org51e2711" class="outline-2">
+<h2 id="org51e2711"><span class="section-number-2">3.</span> Gráficas Estadísticas</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgb829722" class="outline-3">
-<h3 id="orgb829722"><span class="section-number-3">3.1.</span> Gráfica Denuncias vs Tiempo</h3>
+<div id="outline-container-orge52f7ba" class="outline-3">
+<h3 id="orge52f7ba"><span class="section-number-3">3.1.</span> Gráfica Denuncias vs Tiempo</h3>
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
@@ -512,15 +512,15 @@ fname
 </div>
 
 
-<div id="org3fd8fe2" class="figure">
+<div id="org1f671b4" class="figure">
 <p><img src="./images/denuncias_tiempo.png" alt="denuncias_tiempo.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org05681c1" class="outline-3">
-<h3 id="org05681c1"><span class="section-number-3">3.2.</span> Gráfica Top 5 Cantones</h3>
+<div id="outline-container-org416758c" class="outline-3">
+<h3 id="org416758c"><span class="section-number-3">3.2.</span> Gráfica Top 5 Cantones</h3>
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 <pre class="src src-python"><span style="font-weight: bold; font-style: italic;">df_canton</span> = df.groupby(<span style="font-style: italic;">'cant&#243;n'</span>, as_index=<span style="font-weight: bold; text-decoration: underline;">False</span>)[<span style="font-style: italic;">'numero_denuncias'</span>].<span style="font-weight: bold;">sum</span>().sort_values(<span style="font-style: italic;">'numero_denuncias'</span>, ascending=<span style="font-weight: bold; text-decoration: underline;">False</span>).head(5)
@@ -542,7 +542,7 @@ fname
 </div>
 
 
-<div id="org0957c4b" class="figure">
+<div id="org8e8df7d" class="figure">
 <p><img src="./images/denuncias_canton.png" alt="denuncias_canton.png" />
 </p>
 </div>
@@ -569,7 +569,7 @@ console.log("Bloque JavaScript desde procesamiento-robos.org cargado y ejecutado
 <div id="postamble" class="status">
 <p class="date">Fecha: 2026-07-12</p>
 <p class="author">Autor: Echeverría Steven, Jami Mateo, Pérez Martín y Zúñiga Sebastián.</p>
-<p class="date">Created: 2026-07-16 Thu 08:38</p>
+<p class="date">Created: 2026-07-17 Fri 15:59</p>
 </div>
 </body>
 </html>
