@@ -478,10 +478,8 @@ cp -rfv ./images/* ~/ProyectoFinal/BuenosAiresWeather/weather-site/public/images
 - [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-python.html][Python Source Code Blocks in Org Mode]]
 - [[https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/][Systems Crafters Construir tu sitio web con Modo Emacs Org]]
 - [[https://www.youtube.com/watch?v=AfkrzFodoNw][Vídeo Youtube Build Your Website with Org Mode]]
--
-[[https://proceedings.scipy.org/articles/Majora-342d178e-010.pdf][Artículo científico  "Statistical Data Validation of Pandas Dataframes"]]
--
-[[https://gnosis.cx/cleaning/cleaning-data.pdf][Libro en PDF "Cleaning Data for Effective Data Science"]]
+- [[https://proceedings.scipy.org/articles/Majora-342d178e-010.pdf][Artículo científico  "Statistical Data Validation of Pandas Dataframes"]]
+- [[https://gnosis.cx/cleaning/cleaning-data.pdf][Libro en PDF "Cleaning Data for Effective Data Science"]]
 
 * Footnotes
 
